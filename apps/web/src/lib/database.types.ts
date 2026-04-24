@@ -34,6 +34,73 @@ export type Database = {
   }
   public: {
     Tables: {
+      anonymous_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          session_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_hash?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          dilemma_id: string
+          id: string
+          vote_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          dilemma_id: string
+          id?: string
+          vote_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          dilemma_id?: string
+          id?: string
+          vote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
+            referencedRelation: "dilemmas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_vote_id_fkey"
+            columns: ["vote_id"]
+            isOneToOne: true
+            referencedRelation: "votes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dilemmas: {
         Row: {
           author_id: string
@@ -122,6 +189,103 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      vote_options: {
+        Row: {
+          created_at: string
+          dilemma_id: string
+          id: string
+          image_path: string | null
+          label: string
+          position: number
+          price: number | null
+        }
+        Insert: {
+          created_at?: string
+          dilemma_id: string
+          id?: string
+          image_path?: string | null
+          label: string
+          position: number
+          price?: number | null
+        }
+        Update: {
+          created_at?: string
+          dilemma_id?: string
+          id?: string
+          image_path?: string | null
+          label?: string
+          position?: number
+          price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vote_options_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
+            referencedRelation: "dilemmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      votes: {
+        Row: {
+          anonymous_session_id: string | null
+          choice: string | null
+          created_at: string
+          dilemma_id: string
+          id: string
+          option_id: string | null
+          voter_id: string | null
+        }
+        Insert: {
+          anonymous_session_id?: string | null
+          choice?: string | null
+          created_at?: string
+          dilemma_id: string
+          id?: string
+          option_id?: string | null
+          voter_id?: string | null
+        }
+        Update: {
+          anonymous_session_id?: string | null
+          choice?: string | null
+          created_at?: string
+          dilemma_id?: string
+          id?: string
+          option_id?: string | null
+          voter_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_anonymous_session_id_fkey"
+            columns: ["anonymous_session_id"]
+            isOneToOne: false
+            referencedRelation: "anonymous_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
+            referencedRelation: "dilemmas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "vote_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_voter_id_fkey"
+            columns: ["voter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
