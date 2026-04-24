@@ -3,7 +3,7 @@ id: infra-06-deployment-preview
 status: todo
 sub: INFRA
 layer: infra
-depends_on: [test-01-mvp-e2e]
+depends_on: [test-01-mvp-e2e, ops-03-supabase-projects, ops-04-vercel-project]
 estimate: 1.5h
 demo_step: "Preview 배포"
 ---

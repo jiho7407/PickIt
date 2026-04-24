@@ -3,7 +3,7 @@ id: data-05-rls-tests
 status: todo
 sub: QA
 layer: data
-depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema, data-03-followup-schema, data-04-vote-summary-views, infra-03-storage-setup, infra-05-anonymous-session]
+depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema, data-03-followup-schema, data-04-vote-summary-views, infra-03-storage-setup, infra-04-auth-providers, infra-05-anonymous-session]
 estimate: 2h
 demo_step: "권한 회귀 방지"
 ---

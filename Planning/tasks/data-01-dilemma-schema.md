@@ -44,13 +44,26 @@ export const createDilemmaSchema = z.object({
 });
 ```
 
+### profiles 컬럼 (ERD §3)
+
+- `id uuid PK, references auth.users(id) on delete cascade`
+- `nickname text not null` — 2~24자 (check constraint)
+- `birth_year int` nullable
+- `gender text` nullable
+- `life_stage text` nullable
+- `role text not null default 'user'`, check in (`user`, `operator`)
+- `created_at timestamptz default now()`
+- `updated_at timestamptz default now()`
+
 ### DB constraints
 
 - `price > 0`
+- `profiles.nickname`은 2~24자 check constraint.
 - `profiles.role in ('user', 'operator')`, default `'user'`
 - `vote_type in ('buy_skip', 'ab')`
 - `status in ('draft', 'open', 'decided', 'followup_due', 'followed_up', 'archived')`
 - `followup_due_at = created_at + interval '7 days'` 또는 insert 시 기본값 처리
+- `title` 2~80자, `product_name` 1~80자, `category` 1~40자, `situation` 10~1000자 (ERD §3과 일치)
 
 ### RLS
 
@@ -68,8 +81,11 @@ export const createDilemmaSchema = z.object({
 
 ## Acceptance Criteria
 
-- [ ] migration이 `profiles`, `dilemmas`를 생성한다.
-- [ ] `profiles.role`이 기본 사용자와 운영자를 구분한다.
+- [ ] migration이 `profiles`(id/nickname/birth_year/gender/life_stage/role/created_at/updated_at), `dilemmas`를 생성한다.
+- [ ] `profiles.role`이 기본 사용자와 운영자를 구분한다(check constraint).
+- [ ] `profiles.nickname`이 2~24자 check constraint를 가진다.
+- [ ] `dilemmas.price > 0` check constraint가 있다.
+- [ ] ERD §3 인덱스((`status, created_at desc`) 등)가 존재한다.
 - [ ] RLS가 활성화되어 있다.
 - [ ] 공개 고민 select policy가 있다.
 - [ ] 작성자 insert/update/delete policy가 있다.

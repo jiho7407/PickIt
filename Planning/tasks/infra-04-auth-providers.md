@@ -3,7 +3,7 @@ id: infra-04-auth-providers
 status: todo
 sub: INFRA
 layer: infra
-depends_on: [infra-02-supabase-local-and-ci, data-01-dilemma-schema]
+depends_on: [ops-01-google-oauth-credentials, infra-02-supabase-local-and-ci, data-01-dilemma-schema]
 estimate: 2h
 demo_step: "로그인"
 ---
@@ -101,3 +101,5 @@ NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false
 
 - Supabase Auth Next.js: https://supabase.com/docs/guides/auth/server-side/nextjs
 - `Planning/PRD.md §4.4`
+- Google OAuth 자격증명: `ops-01-google-oauth-credentials`
+- Kakao OAuth 자격증명(deferred): `ops-02-kakao-oauth-credentials`

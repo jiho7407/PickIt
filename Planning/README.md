@@ -30,6 +30,13 @@
 
 ## 태스크 목록 (초안)
 
+### Ops (Pretasks — 외부 자원 확보)
+- `ops-01-google-oauth-credentials` — Google OAuth client id/secret 발급
+- `ops-02-kakao-oauth-credentials` — Kakao OAuth 키 (deferred, env flag만 준비)
+- `ops-03-supabase-projects` — Supabase preview/prod project 생성, 키 관리
+- `ops-04-vercel-project` — Vercel 프로젝트 연결, env 주입
+- `ops-05-figma-access` — Figma 접근 권한, 화면 전달 프로세스
+
 ### Infrastructure
 - `infra-01-project-bootstrap` — Next.js/Supabase/uv 개발 기반
 - `infra-02-supabase-local-and-ci` — Supabase local/CI/type-gen 기반

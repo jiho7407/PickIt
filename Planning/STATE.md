@@ -7,11 +7,11 @@
 
 ## Current Iteration
 
-- **Iteration**: 1
+- **Iteration**: 3
 - **Phase**: planning audit complete
 - **Last Updated**: 2026-04-24
 - **Mode**: human-guided planning
-- **Implementation Status**: READY FOR FOUNDATION IMPLEMENTATION
+- **Implementation Status**: READY FOR FOUNDATION IMPLEMENTATION (ops pretask 병행 진행)
 
 ## 다음 목표
 
@@ -22,6 +22,14 @@
 ---
 
 ## 태스크 실행 순서 (topological draft)
+
+### Phase 0 — Pretasks (외부 자원 확보, 코드 작업과 병행 가능)
+
+- `ops-01-google-oauth-credentials` — `infra-04` 착수 전까지 필수
+- `ops-02-kakao-oauth-credentials` — deferred, activation trigger 도달 시 전환
+- `ops-03-supabase-projects` — `infra-06` 착수 전까지 필수
+- `ops-04-vercel-project` — `infra-06` 착수 전까지 필수 (ops-01/03 의존)
+- `ops-05-figma-access` — 첫 `product-*` 착수 전까지 필수
 
 ### Phase 1 — Foundation
 
@@ -161,3 +169,45 @@
 판정:
 
 - Foundation 구현을 시작할 수 있다. Product UI 구현 전에는 해당 태스크별 Figma 화면 프레임만 다시 확인한다.
+
+### Iteration 2 — Planning Audit (2026-04-24)
+
+태스크별 명세 완성도와 의존성 정합성을 한 번 더 점검했다.
+
+수정 사항:
+
+- `data-05-rls-tests` depends_on에 `infra-04-auth-providers`를 추가했다. RLS 테스트 fixture는 Supabase Auth와 `profiles` auto-create trigger에 의존한다.
+- `data-01-dilemma-schema` Spec/Acceptance에 ERD §3 `profiles` 전체 컬럼(nickname/birth_year/gender/life_stage/role)과 nickname 2~24자 check constraint, 필수 인덱스를 명시했다.
+- `product-01-home-vote-feed` depends_on에 `data-02-vote-comment-schema`를 명시했다. "빠른 투표" = votes insert이며, 핵심 의존성을 transitive가 아닌 직접 의존으로 표시한다.
+- `product-00-splash-onboarding-flow`에 로그인 전 선택한 생활 단계 태그가 OAuth 콜백 이후 `profiles.life_stage`로 전달되는 경로를 명시했다. 저장 action은 `product-05a`의 `edit-profile-form`을 재사용한다.
+
+판정:
+
+- 태스크 그래프는 TDD로 순차 구현 가능하다. 외부 키(Kakao OAuth, 운영 env) 확보와 Figma 화면 프레임은 각 태스크 착수 직전에 보강한다.
+
+### Iteration 3 — Pretask Extraction (2026-04-24)
+
+외부 자원 확보(코드 없음)를 별도 `ops` 레이어의 pretask로 분리해, 실제 구현 태스크의 depends_on으로 연결했다.
+
+신규 태스크:
+
+- `ops-01-google-oauth-credentials` (todo)
+- `ops-02-kakao-oauth-credentials` (deferred, activation trigger 명시)
+- `ops-03-supabase-projects` (todo)
+- `ops-04-vercel-project` (todo, ops-01/ops-03 의존)
+- `ops-05-figma-access` (todo)
+
+의존성 반영:
+
+- `infra-04-auth-providers` depends_on에 `ops-01` 추가, Kakao는 References에만 표시.
+- `infra-06-deployment-preview` depends_on에 `ops-03`, `ops-04` 추가.
+
+문서 갱신:
+
+- `tasks/README.md`에 `ops` 레이어와 5개 태스크 표 반영.
+- `Planning/README.md` 태스크 목록에 Ops 섹션 신설.
+- `STATE.md`에 Phase 0 Pretasks 섹션 신설.
+
+판정:
+
+- Phase 0 pretask와 Phase 1 Foundation은 병렬 진행 가능하다. `infra-04` 착수 시 `ops-01`이, `infra-06` 착수 시 `ops-03/ops-04`가 완료돼 있어야 한다. Figma(`ops-05`)는 첫 `product-*` 구현 직전까지 완료한다.
