@@ -19,7 +19,7 @@ function makeDeps(cookieValue?: string, userId: string | null = null) {
   const setCookie = vi.fn((name: string, value: string) => {
     cookies.set(name, value);
   });
-  const findSession = vi.fn(async () => rowId);
+  const findSession = vi.fn(async () => rowId as string | null);
   const upsertSession = vi.fn(async () => rowId);
 
   return {
@@ -55,12 +55,30 @@ describe("ensureAnonymousSession", () => {
   });
 
   it("reuses an existing valid cookie", async () => {
-    const { deps, setCookie, upsertSession } = makeDeps(rawSession);
+    const { deps, findSession, setCookie, upsertSession } = makeDeps(rawSession);
 
     const id = await ensureAnonymousSession(deps);
 
     expect(id).toBe(rowId);
     expect(setCookie).not.toHaveBeenCalled();
+    expect(findSession).toHaveBeenCalledWith(await hashAnonymousSessionValue(rawSession));
+    expect(upsertSession).not.toHaveBeenCalled();
+  });
+
+  it("replaces a valid cookie whose DB row no longer exists", async () => {
+    const { deps, findSession, setCookie, upsertSession } = makeDeps(
+      "33333333-3333-4333-8333-333333333333",
+    );
+    findSession.mockResolvedValueOnce(null);
+
+    const id = await ensureAnonymousSession(deps);
+
+    expect(id).toBe(rowId);
+    expect(setCookie).toHaveBeenCalledWith(
+      ANONYMOUS_SESSION_COOKIE,
+      rawSession,
+      ANONYMOUS_SESSION_COOKIE_OPTIONS,
+    );
     expect(upsertSession).toHaveBeenCalledWith(await hashAnonymousSessionValue(rawSession));
   });
 

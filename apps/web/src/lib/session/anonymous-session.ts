@@ -120,12 +120,20 @@ export async function ensureAnonymousSession(
     return null;
   }
 
-  let sessionValue = getValidCookieValue(deps.cookies);
+  const existingSessionValue = getValidCookieValue(deps.cookies);
 
-  if (!sessionValue) {
-    sessionValue = createSessionValue(deps);
-    deps.cookies.set(ANONYMOUS_SESSION_COOKIE, sessionValue, ANONYMOUS_SESSION_COOKIE_OPTIONS);
+  if (existingSessionValue) {
+    const existingSessionId = await deps.findSession(
+      await hashAnonymousSessionValue(existingSessionValue),
+    );
+
+    if (existingSessionId) {
+      return existingSessionId;
+    }
   }
+
+  const sessionValue = createSessionValue(deps);
+  deps.cookies.set(ANONYMOUS_SESSION_COOKIE, sessionValue, ANONYMOUS_SESSION_COOKIE_OPTIONS);
 
   return deps.upsertSession(await hashAnonymousSessionValue(sessionValue));
 }
