@@ -3,7 +3,7 @@ id: product-04-create-vote-flow
 status: todo
 sub: FE
 layer: product
-depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema]
+depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema, infra-03-storage-setup, infra-04-auth-providers]
 estimate: 2h
 demo_step: "투표 만들기"
 ---

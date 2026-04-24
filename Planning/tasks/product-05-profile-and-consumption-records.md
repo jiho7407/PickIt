@@ -1,14 +1,19 @@
 ---
 id: product-05-profile-and-consumption-records
-status: todo
+status: deprecated
 sub: FE
 layer: product
 depends_on: [data-03-followup-schema, product-03-my-votes-and-comments]
 estimate: 2h
 demo_step: "프로필/소비기록"
+superseded_by: [product-05a-profile, product-05b-consumption-records]
 ---
 
-# 프로필과 소비기록
+# 프로필과 소비기록 (Deprecated)
+
+> 이 태스크는 4개 영역(프로필/내 목록/소비기록/회고 prompt)을 하나로 묶어 비대했다.
+> `product-05a-profile`(기본 프로필)과 `product-05b-consumption-records`(소비기록/회고 prompt)로 분할됐다.
+> 이력 유지 목적으로만 남긴다.
 
 ## Context
 

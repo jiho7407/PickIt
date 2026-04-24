@@ -3,7 +3,7 @@ id: product-01-home-vote-feed
 status: todo
 sub: FE
 layer: product
-depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema]
+depends_on: [data-01-dilemma-schema, data-04-vote-summary-views]
 estimate: 2h
 demo_step: "홈 = 투표"
 ---

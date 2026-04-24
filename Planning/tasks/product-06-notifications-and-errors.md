@@ -3,7 +3,7 @@ id: product-06-notifications-and-errors
 status: todo
 sub: FE
 layer: product
-depends_on: [product-05-profile-and-consumption-records]
+depends_on: [product-05b-consumption-records, data-04-vote-summary-views]
 estimate: 1.5h
 demo_step: "알람/에러"
 ---

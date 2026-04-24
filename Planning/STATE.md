@@ -35,19 +35,28 @@
 4. `data-02-vote-comment-schema`
 5. `data-03-followup-schema`
 
-### Phase 3 — Product Flows
+### Phase 3 — Platform Services
 
-6. `product-00-splash-onboarding-flow`
-7. `product-01-home-vote-feed`
-8. `product-02-vote-detail-flow`
-9. `product-03-my-votes-and-comments`
-10. `product-04-create-vote-flow`
-11. `product-05-profile-and-consumption-records`
-12. `product-06-notifications-and-errors`
+6. `infra-03-storage-setup`
+7. `infra-04-auth-providers`
+8. `infra-05-anonymous-session`
+9. `data-04-vote-summary-views`
+10. `data-05-rls-tests`
 
-### Phase 4 — Integration
+### Phase 4 — Product Flows
 
-13. `test-01-mvp-e2e`
+11. `product-00-splash-onboarding-flow`
+12. `product-01-home-vote-feed`
+13. `product-02-vote-detail-flow`
+14. `product-04-create-vote-flow`
+15. `product-03-my-votes-and-comments`
+16. `product-05a-profile`
+17. `product-05b-consumption-records`
+18. `product-06-notifications-and-errors`
+
+### Phase 5 — Integration
+
+19. `test-01-mvp-e2e`
 
 ---
 

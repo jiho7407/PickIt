@@ -3,7 +3,7 @@ id: test-01-mvp-e2e
 status: todo
 sub: QA
 layer: test
-depends_on: [product-06-notifications-and-errors]
+depends_on: [product-06-notifications-and-errors, data-05-rls-tests]
 estimate: 2h
 demo_step: "End-to-End"
 ---

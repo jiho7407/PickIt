@@ -3,7 +3,7 @@ id: product-00-splash-onboarding-flow
 status: todo
 sub: FE
 layer: product
-depends_on: [infra-01-project-bootstrap]
+depends_on: [infra-04-auth-providers]
 estimate: 2h
 demo_step: "스플래시/온보딩"
 ---

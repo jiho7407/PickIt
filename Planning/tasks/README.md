@@ -58,15 +58,22 @@ Red-Green-Refactor 순서.
 | ID | 상태 | 설명 |
 | --- | --- | --- |
 | `infra-01-project-bootstrap` | todo | Next.js/Supabase/uv 프로젝트 기반 |
-| `infra-02-supabase-local-and-ci` | todo | Supabase local/CI/RLS 테스트 기반 |
+| `infra-02-supabase-local-and-ci` | todo | Supabase local/CI/type-gen 기반 |
+| `infra-03-storage-setup` | todo | Storage 버킷/정책(이미지 업로드) |
+| `infra-04-auth-providers` | todo | Supabase Auth(Google/Kakao) + 세션 미들웨어 |
+| `infra-05-anonymous-session` | todo | 익명 투표 세션 쿠키/DB 연결 |
 | `data-01-dilemma-schema` | todo | 고민/프로필 schema |
 | `data-02-vote-comment-schema` | todo | 투표/한마디 schema |
 | `data-03-followup-schema` | todo | 7일 후 회고 schema |
+| `data-04-vote-summary-views` | todo | 투표 요약 view, 후보 조회 RPC |
+| `data-05-rls-tests` | todo | RLS 통합 테스트 스위트 |
 | `product-00-splash-onboarding-flow` | todo | 스플래시/온보딩/소셜 로그인 진입 |
 | `product-01-home-vote-feed` | todo | 홈 = 투표 피드 |
 | `product-02-vote-detail-flow` | todo | 투표 상세: 살지/말지, A/B |
 | `product-03-my-votes-and-comments` | todo | 나의 투표, 댓글 작성/삭제, 투표 삭제 |
 | `product-04-create-vote-flow` | todo | 투표 만들기: 살지/말지, A/B |
-| `product-05-profile-and-consumption-records` | todo | 프로필, 내 목록, 소비기록/리포트/소비여부 회고 |
+| `product-05-profile-and-consumption-records` | deprecated | 분할됨 → `05a`, `05b` |
+| `product-05a-profile` | todo | 기본 프로필 화면 |
+| `product-05b-consumption-records` | todo | 소비기록, 회고 prompt, 리포트 CTA |
 | `product-06-notifications-and-errors` | todo | 알람, 에러 화면 |
 | `test-01-mvp-e2e` | todo | MVP E2E |
