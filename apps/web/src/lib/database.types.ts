@@ -34,7 +34,95 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dilemmas: {
+        Row: {
+          author_id: string
+          category: string
+          created_at: string
+          followup_due_at: string
+          id: string
+          image_path: string | null
+          price: number
+          product_name: string
+          situation: string
+          status: string
+          title: string
+          updated_at: string
+          vote_type: string
+        }
+        Insert: {
+          author_id: string
+          category: string
+          created_at?: string
+          followup_due_at?: string
+          id?: string
+          image_path?: string | null
+          price: number
+          product_name: string
+          situation: string
+          status?: string
+          title: string
+          updated_at?: string
+          vote_type?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          created_at?: string
+          followup_due_at?: string
+          id?: string
+          image_path?: string | null
+          price?: number
+          product_name?: string
+          situation?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dilemmas_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          birth_year: number | null
+          created_at: string
+          gender: string | null
+          id: string
+          life_stage: string | null
+          nickname: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          birth_year?: number | null
+          created_at?: string
+          gender?: string | null
+          id: string
+          life_stage?: string | null
+          nickname: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          birth_year?: number | null
+          created_at?: string
+          gender?: string | null
+          id?: string
+          life_stage?: string | null
+          nickname?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
