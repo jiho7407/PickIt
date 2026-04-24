@@ -104,10 +104,10 @@ dev-dependencies = [
 3. edge: 환경 변수가 없어도 정적 홈 smoke test는 통과한다.
 4. edge: `uv run pytest`는 테스트가 없거나 기본 테스트로 exit 0가 된다.
 
-## Open Questions
+## Decisions
 
-1. 패키지 매니저는 `pnpm` 확정인가?
-2. Tailwind + shadcn/ui를 바로 도입할 것인가, Tailwind만 먼저 둘 것인가?
+1. 패키지 매니저는 `pnpm`으로 확정한다.
+2. 초기 부트스트랩은 Tailwind만 도입한다. shadcn/ui는 product 태스크에서 실제 컴포넌트가 필요할 때 추가한다.
 
 ## References
 

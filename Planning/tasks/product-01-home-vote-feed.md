@@ -3,7 +3,7 @@ id: product-01-home-vote-feed
 status: todo
 sub: FE
 layer: product
-depends_on: [data-01-dilemma-schema, data-04-vote-summary-views]
+depends_on: [product-00-splash-onboarding-flow, data-01-dilemma-schema, data-04-vote-summary-views, infra-05-anonymous-session]
 estimate: 2h
 demo_step: "홈 = 투표"
 ---
@@ -27,6 +27,7 @@ demo_step: "홈 = 투표"
 - 카드에는 제목, 상품명, 가격, 카테고리, 대표 이미지, 현재 투표 수를 표시한다.
 - 카드에서 빠른 투표 또는 상세 진입이 가능하다.
 - 액션 시 온보딩/로그인 트리거 정책을 따른다.
+- 빠른 투표를 제공하는 경우 익명 세션 기반 중복 방지 정책을 사용한다.
 
 ## TDD
 

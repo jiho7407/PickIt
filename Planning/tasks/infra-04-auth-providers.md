@@ -3,7 +3,7 @@ id: infra-04-auth-providers
 status: todo
 sub: INFRA
 layer: infra
-depends_on: [infra-02-supabase-local-and-ci]
+depends_on: [infra-02-supabase-local-and-ci, data-01-dilemma-schema]
 estimate: 2h
 demo_step: "로그인"
 ---
@@ -65,6 +65,7 @@ NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false
 ### Profile bootstrapping
 
 - `auth.users` insert 시 `profiles` row 자동 생성 trigger (migration) 또는 first-login handler 중 택일.
+- `profiles.role` 기본값은 `user`이며, 운영자 권한은 수동 seed 또는 service role 관리 스크립트로만 부여한다.
 
 ## TDD
 
@@ -81,6 +82,7 @@ NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false
 - [ ] Kakao provider 설정이 env flag로 토글 가능하다.
 - [ ] Next.js middleware가 세션 쿠키를 갱신한다.
 - [ ] 첫 로그인 시 `profiles` row가 자동 생성된다.
+- [ ] 자동 생성된 profile은 `role = 'user'` 기본값을 가진다.
 - [ ] `.env.example`에 필요한 env가 모두 있다.
 
 ## Test Cases
@@ -90,10 +92,10 @@ NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false
 3. edge: 이미 존재하는 사용자의 재로그인 시 `profiles` 중복 생성되지 않음.
 4. permission: 로그아웃 상태에서는 인증 전용 라우트가 리다이렉트된다.
 
-## Open Questions
+## Decisions
 
-1. 첫 로그인 수단은 Google 단독으로 시작할 것인가 (`STATE.md Open Q #7`)?
-2. `profiles` 자동 생성은 DB trigger vs handler 중 어느 쪽인가?
+1. 첫 로그인 수단은 Google로 시작한다. Kakao는 env flag와 설정 슬롯만 준비한다.
+2. `profiles` 자동 생성은 DB trigger를 기본안으로 한다. handler fallback은 trigger 적용이 어려울 때만 사용한다.
 
 ## References
 

@@ -109,10 +109,10 @@ jobs:
 3. happy: CI job이 unit test와 build를 실행한다.
 4. happy: `pnpm db:types`가 `database.types.ts`를 생성한다.
 
-## Open Questions
+## Decisions
 
-1. Supabase local을 Docker 기반으로 강제할 것인가(`STATE.md Open Q #11`)?
-2. CI에서 Supabase를 띄우는 시간이 길다면, 일부 step만 분리해서 돌릴 것인가?
+1. Supabase local은 Supabase CLI의 Docker 기반 실행을 표준으로 한다.
+2. 초기 CI는 Supabase를 포함한 단일 job으로 시작한다. 실행 시간이 길어지면 RLS job 분리는 후속 최적화로 처리한다.
 
 ## References
 

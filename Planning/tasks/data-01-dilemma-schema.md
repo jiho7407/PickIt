@@ -47,6 +47,7 @@ export const createDilemmaSchema = z.object({
 ### DB constraints
 
 - `price > 0`
+- `profiles.role in ('user', 'operator')`, default `'user'`
 - `vote_type in ('buy_skip', 'ab')`
 - `status in ('draft', 'open', 'decided', 'followup_due', 'followed_up', 'archived')`
 - `followup_due_at = created_at + interval '7 days'` 또는 insert 시 기본값 처리
@@ -68,6 +69,7 @@ export const createDilemmaSchema = z.object({
 ## Acceptance Criteria
 
 - [ ] migration이 `profiles`, `dilemmas`를 생성한다.
+- [ ] `profiles.role`이 기본 사용자와 운영자를 구분한다.
 - [ ] RLS가 활성화되어 있다.
 - [ ] 공개 고민 select policy가 있다.
 - [ ] 작성자 insert/update/delete policy가 있다.

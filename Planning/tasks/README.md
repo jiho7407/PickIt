@@ -62,6 +62,7 @@ Red-Green-Refactor 순서.
 | `infra-03-storage-setup` | todo | Storage 버킷/정책(이미지 업로드) |
 | `infra-04-auth-providers` | todo | Supabase Auth(Google/Kakao) + 세션 미들웨어 |
 | `infra-05-anonymous-session` | todo | 익명 투표 세션 쿠키/DB 연결 |
+| `infra-06-deployment-preview` | todo | Vercel/Supabase preview 배포와 운영 env 점검 |
 | `data-01-dilemma-schema` | todo | 고민/프로필 schema |
 | `data-02-vote-comment-schema` | todo | 투표/한마디 schema |
 | `data-03-followup-schema` | todo | 7일 후 회고 schema |

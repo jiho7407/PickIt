@@ -62,6 +62,10 @@ demo_step: "권한 회귀 방지"
 - 작성자가 아닌 사용자의 insert 거부
 - 한 dilemma에 하나만 insert 가능
 
+#### operator RPC
+- `operator` role은 알림/회고 후보 RPC 호출 허용
+- 일반 `user` role과 `anon`은 운영자 RPC 호출 거부
+
 #### storage (dilemma-images, vote-option-images)
 - 다른 사용자 경로 업로드 거부
 - 공개 읽기 허용 (MVP 공개 버킷 가정)
@@ -76,6 +80,7 @@ demo_step: "권한 회귀 방지"
 
 - [ ] 5개 RLS 테스트 파일이 local Supabase에 연결돼 실행된다.
 - [ ] 각 파일당 allow/deny 케이스가 모두 있다.
+- [ ] 운영자 role 기반 RPC allow/deny 케이스가 있다.
 - [ ] 실행 커맨드가 `pnpm test:rls`로 문서화된다.
 - [ ] CI에서 선택적으로 실행되거나, 최소 로컬 실행 방법이 기술돼 있다.
 
@@ -88,6 +93,8 @@ demo_step: "권한 회귀 방지"
 5. deny: 비작성자의 followup insert → 거부.
 6. allow: anon이 open dilemma select → 허용.
 7. deny: user_b가 user_a 경로에 storage 업로드 → 거부.
+8. deny: 일반 user가 notification candidates RPC 호출 → 거부.
+9. allow: operator가 notification candidates RPC 호출 → 허용.
 
 ## References
 

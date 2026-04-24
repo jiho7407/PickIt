@@ -25,7 +25,7 @@ demo_step: "투표 상세"
 ## Spec
 
 - 살지/말지 투표: `buy`, `skip`
-- A/B 투표: `option_a`, `option_b`
+- A/B 투표: `vote_options.position` 1/2를 렌더링하고 선택 시 해당 `option_id`로 투표한다.
 - 투표 후 결과 비율과 댓글/한마디를 보여준다.
 - 중복 투표는 막는다.
 

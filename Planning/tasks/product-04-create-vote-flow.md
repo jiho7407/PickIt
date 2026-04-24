@@ -43,9 +43,17 @@ type VoteType = "buy_skip" | "ab";
 - title
 - optionAName
 - optionBName
+- optionAPrice
+- optionBPrice
 - optionAImagePath
 - optionBImagePath
 - situation
+
+### 생성 규칙
+
+- 작성자는 authenticated user여야 한다.
+- 생성된 dilemma의 기본 status는 `open`이다.
+- `ab` 타입은 `vote_options.position = 1, 2` row를 같은 transaction/server action에서 생성한다.
 
 ## TDD
 
@@ -62,6 +70,7 @@ type VoteType = "buy_skip" | "ab";
 - [ ] A/B 투표를 만들 수 있다.
 - [ ] 필수 필드 validation이 있다.
 - [ ] 생성 후 상세 화면으로 이동한다.
+- [ ] A/B 생성 시 두 개의 vote_options가 함께 생성된다.
 - [ ] Figma 구현 시점에 만들기 화면 프레임들을 다시 확인한다.
 
 ## Test Cases

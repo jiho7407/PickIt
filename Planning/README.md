@@ -11,8 +11,8 @@
 4. **[STATE.md](./STATE.md)** — 현재 상태, Quality Gate, 태스크 실행 순서
 5. **[tasks/](./tasks/)** — 이슈 단위 구현 태스크
 6. **[reviews/](./reviews/)** — 기획 리뷰 로그
-7. **[research/](./research/)** — 외부 조사 및 기술 판단 노트
-8. **[fixes/](./fixes/)** — 리뷰에서 나온 수정 항목 처리 로그
+7. **[research/](./research/)** — 외부 조사 및 기술 판단 노트(필요 시 생성)
+8. **[fixes/](./fixes/)** — 리뷰에서 나온 수정 항목 처리 로그(필요 시 생성)
 
 ## 핵심 결정 요약
 
@@ -36,6 +36,7 @@
 - `infra-03-storage-setup` — Storage 버킷/정책(이미지 업로드)
 - `infra-04-auth-providers` — Supabase Auth(Google/Kakao) + 세션 미들웨어
 - `infra-05-anonymous-session` — 익명 투표 세션 쿠키/DB 연결
+- `infra-06-deployment-preview` — Vercel/Supabase preview 배포와 운영 env 점검
 
 ### Data
 - `data-01-dilemma-schema` — 고민/프로필/이미지 DB 모델

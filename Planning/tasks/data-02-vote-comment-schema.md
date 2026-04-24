@@ -14,6 +14,8 @@ demo_step: "투표"
 
 PickIt의 핵심 피드백 루프는 한 고민에 대해 여러 사용자가 `buy`/`skip` 투표와 짧은 한마디를 남기는 것이다. 중복 투표 방지는 DB 제약과 테스트로 보장한다.
 
+익명 투표 쿠키/미들웨어는 `infra-05-anonymous-session`에서 구현한다. 이 태스크는 votes가 참조할 `anonymous_sessions` 기본 테이블과 제약만 만든다.
+
 연결 문서:
 
 - `PRD.md FR-V-1~5`
@@ -69,6 +71,7 @@ export function calculateVoteSummary(votes: VoteChoice[]): VoteSummary;
 ## Acceptance Criteria
 
 - [ ] vote_options/votes/comments/anonymous_sessions migration이 있다.
+- [ ] anonymous_sessions는 쿠키 원문이 아니라 해시된 식별자만 저장하도록 설계돼 있다.
 - [ ] 중복 투표 unique constraint가 있다.
 - [ ] 투표 요약 view 또는 함수가 있다.
 - [ ] 투표 집계 unit test가 통과한다.

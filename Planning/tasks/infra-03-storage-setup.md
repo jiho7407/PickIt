@@ -73,10 +73,10 @@ export async function getPublicUrl(path: string): string;
 3. edge: `application/pdf` 업로드 거부.
 4. permission: 다른 사용자 경로 업로드 거부.
 
-## Open Questions
+## Decisions
 
-1. 공개 버킷 vs signed URL: MVP 공개 버킷으로 확정할 것인가?
-2. 이미지 리사이징은 클라이언트에서 할 것인가, Edge Function을 쓸 것인가?
+1. MVP Storage 이미지는 공개 버킷으로 시작한다.
+2. MVP에서는 MIME/크기 제한만 필수로 두고, 이미지 리사이징/변환은 후속으로 미룬다.
 
 ## References
 

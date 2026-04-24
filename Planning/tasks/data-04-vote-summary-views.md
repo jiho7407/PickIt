@@ -55,8 +55,9 @@ demo_step: "결과/운영 조회"
 
 ### 권한
 
-- view select: public (open 상태만 노출되도록 RLS 고려)
-- RPC: `security definer` + 운영자 role 제한, 또는 service role 전용.
+- view select: public (open/decided/followup_due/followed_up 상태만 노출)
+- RPC: `security definer` + `profiles.role = 'operator'` 확인, 또는 service role 전용 admin endpoint에서만 호출.
+- 운영자 role 판별 기준은 `profiles.role in ('user', 'operator')`이다.
 
 ## TDD
 
@@ -74,6 +75,7 @@ demo_step: "결과/운영 조회"
 - [ ] `get_notification_candidates` RPC가 있다.
 - [ ] view/RPC를 호출하는 integration test가 통과한다.
 - [ ] 임계값은 상수 또는 파라미터로 분리돼 있다.
+- [ ] 운영자 전용 RPC는 비운영자 호출이 차단된다.
 
 ## Test Cases
 

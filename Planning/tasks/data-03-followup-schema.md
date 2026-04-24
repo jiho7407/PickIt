@@ -47,6 +47,8 @@ export function calculateFollowupDueAt(createdAt: Date): Date;
 - `saved_amount >= 0`
 - `satisfaction_score between 1 and 5`
 - `dilemma_id unique`
+- followup insert는 `dilemmas.status = 'followed_up'` 갱신과 같은 transaction/server action 안에서 처리한다.
+- `skipped` 저장 시 `saved_amount = dilemmas.price`, `bought` 저장 시 `saved_amount = 0`을 DB constraint 또는 trigger로 보강한다.
 
 ## TDD
 
@@ -62,6 +64,7 @@ export function calculateFollowupDueAt(createdAt: Date): Date;
 - [ ] 작성자만 followup을 작성할 수 있다.
 - [ ] 한 고민에는 followup이 하나만 존재한다.
 - [ ] `skipped`는 price만큼 절약 금액을 저장한다.
+- [ ] followup 작성 후 dilemma 상태가 `followed_up`으로 전이된다.
 - [ ] 회고 후보 조회 쿼리 또는 RPC가 있다.
 
 ## Test Cases
