@@ -57,6 +57,33 @@ uv run pytest
 아직 존재하지 않는 명령이 있다면, 새 convention을 임의로 추가하기 전에 현재
 진행 중인 task와 foundation 진행 상태를 확인한다.
 
+## 로컬 개발
+
+### 앱
+
+```bash
+pnpm install
+pnpm dev
+```
+
+웹 앱은 기본적으로 `http://127.0.0.1:3000`에서 실행된다.
+
+### Supabase
+
+Supabase local 개발은 Supabase CLI와 Docker 기반 실행을 표준으로 한다.
+
+```bash
+supabase start
+pnpm db:reset
+pnpm db:types
+./scripts/qa/check_supabase.sh
+```
+
+`pnpm db:types`는 local Supabase 스키마에서 TypeScript 타입을 생성해
+`apps/web/src/lib/database.types.ts`에 쓴다. RLS 테스트 케이스는
+`data-05-rls-tests`에서 추가하며, 현재는 `apps/web/tests/rls/` 위치와 실행
+명령만 예약되어 있다.
+
 ## 프로필/프론트엔드 담당자 안내
 
 프로필 담당자는 먼저 `DEVELOPMENT_SPLIT.md`를 읽는다.

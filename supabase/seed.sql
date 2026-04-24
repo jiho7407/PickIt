@@ -1,0 +1,2 @@
+-- Seed data is intentionally empty for infra-02.
+-- Schema-specific seed rows are introduced by later data tasks.

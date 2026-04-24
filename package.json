@@ -8,6 +8,10 @@
     "build": "pnpm --filter web build",
     "lint": "pnpm --filter web lint",
     "test": "pnpm --filter web test",
-    "test:e2e": "pnpm --filter web test:e2e"
+    "test:e2e": "pnpm --filter web test:e2e",
+    "db:start": "pnpm --filter web db:start",
+    "db:reset": "pnpm --filter web db:reset",
+    "db:types": "pnpm --filter web db:types",
+    "test:rls": "pnpm --filter web test:rls"
   }
 }

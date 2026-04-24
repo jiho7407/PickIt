@@ -13,3 +13,5 @@ test-results/
 .pytest_cache/
 __pycache__/
 .DS_Store
+supabase/.branches/
+supabase/.temp/
