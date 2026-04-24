@@ -25,6 +25,7 @@ demo_step: "프로필"
 - `apps/web/src/features/profile/profile-summary.tsx` (create)
 - `apps/web/src/features/profile/profile-summary.test.tsx` (create)
 - `apps/web/src/features/profile/edit-profile-form.tsx` (create)
+- `apps/web/src/features/profile/profile-actions.ts` (update/reuse from `product-00`)
 
 ## Spec
 
@@ -32,6 +33,7 @@ demo_step: "프로필"
 - 내 투표/내 댓글/소비기록으로 이동하는 진입점 4개.
 - 비로그인 접근 시 로그인 유도로 리다이렉트.
 - 닉네임 편집(2~24자, Zod 검증) — 인라인 또는 모달.
+- `product-00`에서 만든 공용 profile action을 재사용/확장한다. 온보딩의 `life_stage` 저장 경로를 다시 만들지 않는다.
 
 ## TDD
 
@@ -59,4 +61,4 @@ demo_step: "프로필"
 
 ## References
 
-- `Planning/ERD.md §3 profiles`
+- `../ERD.md §3 profiles`

@@ -19,7 +19,7 @@ PickIt의 핵심 피드백 루프는 한 고민에 대해 여러 사용자가 `b
 연결 문서:
 
 - `PRD.md FR-V-1~5`
-- `ERD.md votes, comments`
+- `ERD.md votes, vote_options, comments, anonymous_sessions`
 
 ## Files
 
@@ -56,9 +56,13 @@ export function calculateVoteSummary(votes: VoteChoice[]): VoteSummary;
 - `choice in ('buy', 'skip')`
 - `buy_skip` 투표는 `choice` 사용
 - `ab` 투표는 `option_id` 사용
+- `ab` dilemma는 `vote_options.position = 1, 2` 두 row를 가진다.
 - `(voter_id is not null) != (anonymous_session_id is not null)`
 - unique `(dilemma_id, voter_id)` where voter_id is not null
 - unique `(dilemma_id, anonymous_session_id)` where anonymous_session_id is not null
+- 작성자는 자기 dilemma에 vote를 insert할 수 없다.
+- `comments.vote_id`는 not null + unique이며, 같은 `dilemma_id`의 vote에 연결된다.
+- 익명 comment는 vote-linked flow에서만 생성되며, MVP에서는 수정/삭제하지 않는다.
 
 ## TDD
 
@@ -73,7 +77,10 @@ export function calculateVoteSummary(votes: VoteChoice[]): VoteSummary;
 - [ ] vote_options/votes/comments/anonymous_sessions migration이 있다.
 - [ ] anonymous_sessions는 쿠키 원문이 아니라 해시된 식별자만 저장하도록 설계돼 있다.
 - [ ] 중복 투표 unique constraint가 있다.
-- [ ] 투표 요약 view 또는 함수가 있다.
+- [ ] 작성자 자기 투표 방지 constraint/policy/test가 있다.
+- [ ] A/B 투표는 position 1/2 옵션 제약을 가진다.
+- [ ] vote-linked comment 제약(`vote_id` not null, unique, same dilemma)이 있다.
+- [ ] `calculateVoteSummary` 순수 함수가 있다. DB view/RPC는 `data-04`에서 만든다.
 - [ ] 투표 집계 unit test가 통과한다.
 - [ ] 댓글 body는 1~200자로 제한된다.
 
@@ -84,8 +91,10 @@ export function calculateVoteSummary(votes: VoteChoice[]): VoteSummary;
 3. edge: 홀수 투표 비율 반올림이 안정적으로 동작한다.
 4. permission: 같은 authenticated user는 중복 투표할 수 없다.
 5. permission: 같은 anonymous session은 중복 투표할 수 없다.
+6. permission: 작성자는 자기 고민에 투표할 수 없다.
+7. edge: vote 없이 comment만 단독 생성하려 하면 거부된다.
 
 ## References
 
-- `Planning/ERD.md §3 votes`
+- `../ERD.md §3 votes, vote_options, comments`
 - PostgreSQL partial indexes: https://www.postgresql.org/docs/current/indexes-partial.html

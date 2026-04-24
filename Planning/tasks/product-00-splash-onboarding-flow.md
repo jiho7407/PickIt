@@ -3,7 +3,7 @@ id: product-00-splash-onboarding-flow
 status: todo
 sub: FE
 layer: product
-depends_on: [infra-04-auth-providers]
+depends_on: [ops-05-figma-access, infra-04-auth-providers]
 estimate: 2h
 demo_step: "스플래시/온보딩"
 ---
@@ -27,6 +27,7 @@ demo_step: "스플래시/온보딩"
 - `apps/web/src/features/onboarding/onboarding-screen.tsx` (create)
 - `apps/web/src/features/onboarding/onboarding-trigger.ts` (create)
 - `apps/web/src/features/auth/social-login-buttons.tsx` (create)
+- `apps/web/src/features/profile/profile-actions.ts` (create — minimal `life_stage` update)
 - `apps/web/src/features/onboarding/onboarding-screen.test.tsx` (create)
 
 ## Spec
@@ -40,7 +41,8 @@ demo_step: "스플래시/온보딩"
 
 - 로그인 전 선택한 값은 클라이언트(sessionStorage 또는 in-memory)에 임시 저장한다.
 - OAuth 콜백 이후 첫 접근 시 `profiles.life_stage`를 업데이트한다.
-- update action은 `product-05a-profile`의 `edit-profile-form` 저장 경로를 재사용한다(별도 구현 금지).
+- 공용 `profile-actions.ts`에 최소 `life_stage` update action을 먼저 만든다.
+- `product-05a-profile`은 이 action을 재사용/확장해 닉네임 편집과 전체 프로필 편집을 처리한다.
 - 실패 시 프로필 편집에서 다시 설정할 수 있음을 안내한다.
 
 ## TDD
@@ -49,6 +51,8 @@ demo_step: "스플래시/온보딩"
 2. Green: 홈 렌더링과 온보딩 트리거 조건 구현.
 3. Red: 로그인 CTA 클릭이 auth provider 함수로 이어지는 테스트.
 4. Green: 소셜 로그인 버튼 연결.
+5. Red: OAuth 이후 pending `life_stage` 값이 profile update action으로 저장되는 테스트.
+6. Green: 공용 profile action과 pending value consume 흐름 구현.
 
 ## Acceptance Criteria
 
@@ -57,6 +61,7 @@ demo_step: "스플래시/온보딩"
 - [ ] 카카오/구글 로그인 CTA가 있다.
 - [ ] 생활 단계 태그 선택 UI가 있다.
 - [ ] 로그인 전 선택한 생활 단계 값이 로그인 후 `profiles.life_stage`로 전달된다.
+- [ ] `product-05a-profile`에 대한 역방향 의존 없이 공용 profile action이 존재한다.
 - [ ] Figma 구현 시점에 개별 화면 프레임을 다시 확인한다.
 
 ## Test Cases
@@ -65,7 +70,8 @@ demo_step: "스플래시/온보딩"
 2. happy: 투표 버튼 클릭 시 온보딩/로그인 유도가 열린다.
 3. edge: 생활 단계 태그는 하나만 선택된다.
 4. edge: 선택 전 완료 버튼은 비활성이다.
+5. happy: 로그인 후 pending 생활 단계 값이 `profiles.life_stage`에 저장된다.
 
 ## References
 
-- `Planning/ONE_PAGER.md §11`
+- `../ONE_PAGER.md §11`

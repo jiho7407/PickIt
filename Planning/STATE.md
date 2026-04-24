@@ -7,7 +7,7 @@
 
 ## Current Iteration
 
-- **Iteration**: 3
+- **Iteration**: 4
 - **Phase**: planning audit complete
 - **Last Updated**: 2026-04-24
 - **Mode**: human-guided planning
@@ -80,7 +80,7 @@
 - [x] 각 태스크의 depends_on이 명시돼 있다.
 - [x] 각 태스크의 예상 소요 시간이 30분~2시간 범위 안이다.
 - [x] 각 태스크에 작업할 파일 경로가 명시돼 있다.
-- [x] 각 태스크에 테스트 케이스가 최소 3개 있다.
+- [x] 각 구현 태스크에 테스트 케이스가 최소 3개 있다. 코드가 없는 `ops` pretask는 수동 Deliverables/Acceptance Criteria로 검증한다.
 - [x] 화면 IA가 태스크와 연결돼 있다. Figma 노드는 개발 직전에 연결한다.
 - [x] PRD/ERD/tasks 제3자 리뷰가 최소 1회 수행됐다.
 
@@ -211,3 +211,21 @@
 판정:
 
 - Phase 0 pretask와 Phase 1 Foundation은 병렬 진행 가능하다. `infra-04` 착수 시 `ops-01`이, `infra-06` 착수 시 `ops-03/ops-04`가 완료돼 있어야 한다. Figma(`ops-05`)는 첫 `product-*` 구현 직전까지 완료한다.
+
+### Iteration 4 — Planning Audit (2026-04-24)
+
+검수 프롬프트 기준으로 `planning/` 전체를 다시 읽고 숨은 의존성, vote-linked comment 모델, ops 태스크 예외 규칙을 보정했다.
+
+수정 사항:
+
+- `product-00`의 로그인 후 생활 단계 저장이 미래 태스크(`product-05a`)를 참조하던 숨은 역방향 의존성을 제거했다. 공용 `profile-actions.ts`를 `product-00`에서 먼저 만들고, `product-05a`가 재사용/확장하도록 변경했다.
+- 첫 product 태스크가 Figma 전달 프로세스에 의존한다는 정책을 frontmatter에 반영했다(`product-00` depends_on에 `ops-05` 추가).
+- `comments`를 독립 댓글이 아니라 `vote_id`에 연결된 "투표 한마디"로 고정했다. ERD, `data-02`, `data-05`, `product-02`, `product-03`의 책임을 이에 맞게 정리했다.
+- `data-02`의 vote summary DB view 요구를 제거하고, 순수 함수는 `data-02`, DB view/RPC는 `data-04`가 담당하도록 중복을 해소했다.
+- 회고/알림 후보 RPC를 author-facing(`get_followup_candidates`, `get_my_notification_candidates`)과 operator-only(`get_operator_notification_candidates`)로 분리했다.
+- 코드가 없는 `ops` pretask는 TDD/Test Cases 대신 Deliverables/Acceptance Criteria로 검증한다는 예외를 `tasks/README.md`와 Quality Gate에 명시했다.
+- 저장소 구조 예시의 `Planning/` 표기를 실제 경로인 `planning/`으로 수정했다.
+
+판정:
+
+- 구현 태스크 그래프는 사이클 없이 유지된다. Foundation 구현을 시작할 수 있고, product 구현 전에는 `ops-05`를 완료해야 한다.

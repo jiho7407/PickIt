@@ -56,7 +56,7 @@
 - `product-00-splash-onboarding-flow` — 스플래시/온보딩/소셜 로그인 진입
 - `product-01-home-vote-feed` — 홈 = 투표 피드
 - `product-02-vote-detail-flow` — 투표 상세: 살지/말지, A/B
-- `product-03-my-votes-and-comments` — 나의 투표, 댓글 작성/삭제, 투표 삭제
+- `product-03-my-votes-and-comments` — 나의 투표, vote-linked 한마디 관리/삭제, 투표 삭제
 - `product-04-create-vote-flow` — 투표 만들기: 살지/말지, A/B
 - `product-05a-profile` — 기본 프로필 화면
 - `product-05b-consumption-records` — 소비기록, 회고 prompt, 리포트 CTA

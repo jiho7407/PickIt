@@ -17,6 +17,8 @@ layer:
 
 ## 태스크 파일 포맷
 
+구현 태스크(`infra`, `data`, `product`, `test`)는 아래 포맷을 따른다. 코드가 없는 `ops` pretask는 `TDD`/`Test Cases` 대신 `Out of scope`, `Deliverables`, `Acceptance Criteria`로 수동 검증 기준을 명시할 수 있다.
+
 ```markdown
 ---
 id: product-04-create-vote-flow
@@ -77,7 +79,7 @@ Red-Green-Refactor 순서.
 | `product-00-splash-onboarding-flow` | todo | 스플래시/온보딩/소셜 로그인 진입 |
 | `product-01-home-vote-feed` | todo | 홈 = 투표 피드 |
 | `product-02-vote-detail-flow` | todo | 투표 상세: 살지/말지, A/B |
-| `product-03-my-votes-and-comments` | todo | 나의 투표, 댓글 작성/삭제, 투표 삭제 |
+| `product-03-my-votes-and-comments` | todo | 나의 투표, vote-linked 한마디 관리/삭제, 투표 삭제 |
 | `product-04-create-vote-flow` | todo | 투표 만들기: 살지/말지, A/B |
 | `product-05-profile-and-consumption-records` | deprecated | 분할됨 → `05a`, `05b` |
 | `product-05a-profile` | todo | 기본 프로필 화면 |

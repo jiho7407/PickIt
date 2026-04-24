@@ -39,7 +39,7 @@ demo_step: "소비기록/회고"
 
 ### 회고 Prompt
 
-- `data-04` RPC `get_followup_candidates(now)` 또는 동등 쿼리 기반.
+- `data-04` RPC `get_followup_candidates(now)` 또는 동등 쿼리 기반. 이 RPC는 현재 authenticated author의 고민만 반환해야 한다.
 - 프로필 페이지와 소비기록 페이지 상단에 동일한 컴포넌트로 노출(두 위치 모두).
 - 각 prompt에서 "샀다 / 참았다" 선택 폼으로 진입.
 
@@ -83,5 +83,5 @@ demo_step: "소비기록/회고"
 
 ## References
 
-- `Planning/ONE_PAGER.md §6`
-- `Planning/PRD.md §4.3`
+- `../ONE_PAGER.md §6`
+- `../PRD.md §4.3`

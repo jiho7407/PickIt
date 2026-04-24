@@ -54,8 +54,9 @@ demo_step: "권한 회귀 방지"
 
 #### comments
 - insert: authenticated 또는 vote-linked anonymous
-- delete: author only
+- delete: authenticated author only
 - 다른 사용자의 comment delete 거부
+- anonymous vote-linked comment update/delete 거부
 
 #### followups
 - insert: `auth.uid() = author_id`
@@ -65,6 +66,7 @@ demo_step: "권한 회귀 방지"
 #### operator RPC
 - `operator` role은 알림/회고 후보 RPC 호출 허용
 - 일반 `user` role과 `anon`은 운영자 RPC 호출 거부
+- 일반 authenticated user의 followup/notification 후보 RPC는 본인 author 범위만 반환
 
 #### storage (dilemma-images, vote-option-images)
 - 다른 사용자 경로 업로드 거부
@@ -95,8 +97,10 @@ demo_step: "권한 회귀 방지"
 7. deny: user_b가 user_a 경로에 storage 업로드 → 거부.
 8. deny: 일반 user가 notification candidates RPC 호출 → 거부.
 9. allow: operator가 notification candidates RPC 호출 → 허용.
+10. deny: anonymous vote-linked comment를 update/delete → 거부.
+11. deny: user_a의 followup candidates에 user_b의 dilemma가 포함되지 않음.
 
 ## References
 
-- `Planning/ERD.md §5`
+- `../ERD.md §5`
 - Supabase RLS testing: https://supabase.com/docs/guides/database/postgres/row-level-security

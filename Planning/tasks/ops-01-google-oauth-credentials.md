@@ -31,15 +31,19 @@ demo_step: N/A
 - [ ] OAuth 2.0 Client ID(Web application) 발급
 - [ ] Authorized redirect URIs 등록:
   - `http://127.0.0.1:54321/auth/v1/callback` (Supabase local)
-  - `{SUPABASE_PROJECT_URL}/auth/v1/callback` (preview/prod)
+  - `{SUPABASE_PROJECT_URL}/auth/v1/callback` (preview/prod, `ops-03` 완료 후 등록)
 - [ ] `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`을 팀 비밀 저장소(1Password 등)에 보관
-- [ ] Supabase preview project Auth → Google provider에 client id/secret 입력
+- [ ] Supabase local 또는 preview project Auth → Google provider에 client id/secret 입력
 - [ ] `apps/web/.env.example` 템플릿에 env 키 반영(실제 값 금지)
+
+## Dependency Note
+
+`infra-04-auth-providers`를 시작하기 위한 unblock 기준은 local callback URI와 Google client id/secret 확보다. Preview project provider 검증은 `ops-03-supabase-projects`, `ops-04-vercel-project` 완료 후 다시 확인한다.
 
 ## Acceptance Criteria
 
 - [ ] client id/secret이 팀 비밀 저장소에 있다.
-- [ ] Supabase preview project에서 Google provider로 수동 로그인 테스트가 통과한다.
+- [ ] Supabase local 또는 preview project에서 Google provider로 수동 로그인 테스트가 통과한다.
 - [ ] `.env.example`에 필수 env 키가 있다(값은 비어 있음).
 - [ ] redirect URI 목록이 README 또는 STATE에 문서화된다.
 

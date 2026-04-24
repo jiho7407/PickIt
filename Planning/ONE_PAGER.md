@@ -138,7 +138,7 @@ Draft → Open → Decided → FollowupDue → FollowedUp → Archived
 
 ```text
 PickIt/
-├── Planning/
+├── planning/
 │   ├── ONE_PAGER.md
 │   ├── PRD.md
 │   ├── ERD.md
