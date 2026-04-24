@@ -157,6 +157,54 @@ export type Database = {
           },
         ]
       }
+      followups: {
+        Row: {
+          author_id: string
+          dilemma_id: string
+          id: string
+          note: string | null
+          outcome: string
+          responded_at: string
+          satisfaction_score: number | null
+          saved_amount: number
+        }
+        Insert: {
+          author_id: string
+          dilemma_id: string
+          id?: string
+          note?: string | null
+          outcome: string
+          responded_at?: string
+          satisfaction_score?: number | null
+          saved_amount?: number
+        }
+        Update: {
+          author_id?: string
+          dilemma_id?: string
+          id?: string
+          note?: string | null
+          outcome?: string
+          responded_at?: string
+          satisfaction_score?: number | null
+          saved_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followups_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followups_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: true
+            referencedRelation: "dilemmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           birth_year: number | null
@@ -292,7 +340,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_followup_candidates: {
+        Args: { p_now?: string }
+        Returns: {
+          dilemma_id: string
+          followup_due_at: string
+          price: number
+          product_name: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
