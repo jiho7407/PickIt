@@ -3,7 +3,7 @@ id: product-03-my-votes-and-comments
 status: todo
 sub: FE
 layer: product
-depends_on: [product-02-vote-detail-flow]
+depends_on: [product-02-vote-detail-flow, data-02-vote-comment-schema]
 estimate: 2h
 demo_step: "나의투표/댓글 관리"
 ---

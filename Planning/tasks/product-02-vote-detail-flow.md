@@ -3,7 +3,7 @@ id: product-02-vote-detail-flow
 status: todo
 sub: FE
 layer: product
-depends_on: [product-01-home-vote-feed, infra-05-anonymous-session, data-04-vote-summary-views]
+depends_on: [product-01-home-vote-feed, infra-05-anonymous-session, data-02-vote-comment-schema, data-04-vote-summary-views]
 estimate: 2h
 demo_step: "투표 상세"
 ---

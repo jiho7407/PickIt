@@ -7,7 +7,7 @@
 
 ## Current Iteration
 
-- **Iteration**: 4
+- **Iteration**: 5
 - **Phase**: planning audit complete
 - **Last Updated**: 2026-04-24
 - **Mode**: human-guided planning
@@ -229,3 +229,19 @@
 판정:
 
 - 구현 태스크 그래프는 사이클 없이 유지된다. Foundation 구현을 시작할 수 있고, product 구현 전에는 `ops-05`를 완료해야 한다.
+
+### Iteration 5 — Direct Dependency Tightening (2026-04-24)
+
+Iteration 2에서 정한 "핵심 의존성은 transitive가 아닌 직접 의존으로 표기" 규칙을 product/test 태스크에 추가 적용했다.
+
+수정 사항:
+
+- `product-00-splash-onboarding-flow` depends_on에 `data-01-dilemma-schema`를 추가했다. 온보딩 이후 `profiles.life_stage`를 업데이트하므로 profiles schema에 직접 의존한다.
+- `product-00-splash-onboarding-flow`에서 Kakao CTA는 `NEXT_PUBLIC_AUTH_KAKAO_ENABLED=true`일 때만 렌더링한다고 명시했다. `ops-02`가 deferred인 동안 버튼이 노출되지 않도록 한다.
+- `product-02-vote-detail-flow` depends_on에 `data-02-vote-comment-schema`를 추가했다. 상세 화면은 vote/comment insert를 직접 수행한다.
+- `product-03-my-votes-and-comments` depends_on에 `data-02-vote-comment-schema`를 추가했다. 내 투표와 vote-linked 한마디 목록/삭제가 votes/comments schema에 직접 의존한다.
+- `test-01-mvp-e2e` depends_on에 `product-02-vote-detail-flow`, `product-05b-consumption-records`를 추가했다. E2E 시나리오가 투표 상세와 회고/소비기록 UI를 직접 통과하기 때문이다.
+
+판정:
+
+- topological 순서는 유지된다. 추가 의존성은 모두 기존 Phase 순서 안에서 앞선 태스크를 가리키며, Foundation 구현 시작 가능 상태는 변하지 않는다.

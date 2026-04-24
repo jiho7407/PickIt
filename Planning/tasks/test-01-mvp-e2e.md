@@ -3,7 +3,7 @@ id: test-01-mvp-e2e
 status: todo
 sub: QA
 layer: test
-depends_on: [product-04-create-vote-flow, product-06-notifications-and-errors, data-05-rls-tests]
+depends_on: [product-02-vote-detail-flow, product-04-create-vote-flow, product-05b-consumption-records, product-06-notifications-and-errors, data-05-rls-tests]
 estimate: 2h
 demo_step: "End-to-End"
 ---
@@ -56,5 +56,5 @@ demo_step: "End-to-End"
 
 ## References
 
-- `Planning/ONE_PAGER.md §10`
+- `../ONE_PAGER.md §10`
 - Playwright docs: https://playwright.dev/

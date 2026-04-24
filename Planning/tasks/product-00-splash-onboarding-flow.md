@@ -3,7 +3,7 @@ id: product-00-splash-onboarding-flow
 status: todo
 sub: FE
 layer: product
-depends_on: [ops-05-figma-access, infra-04-auth-providers]
+depends_on: [ops-05-figma-access, infra-04-auth-providers, data-01-dilemma-schema]
 estimate: 2h
 demo_step: "스플래시/온보딩"
 ---
@@ -34,7 +34,7 @@ demo_step: "스플래시/온보딩"
 
 - 스플래시는 앱 로고/브랜드를 짧게 보여준다.
 - 온보딩은 강제 첫 화면이 아니라 액션 시점 모달/페이지로 진입한다.
-- 카카오/구글 로그인 CTA를 제공한다.
+- 구글 로그인 CTA를 기본 노출한다. 카카오 로그인 CTA는 `NEXT_PUBLIC_AUTH_KAKAO_ENABLED=true`일 때만 렌더링한다(`ops-02` activation trigger 도달 전에는 숨김).
 - 생활 단계 태그 선택은 1개 선택을 기본으로 한다.
 
 ### 생활 단계 저장 경로
@@ -58,7 +58,7 @@ demo_step: "스플래시/온보딩"
 
 - [ ] 첫 방문자는 홈 투표 피드를 볼 수 있다.
 - [ ] 의미 있는 액션 시 온보딩/로그인 유도가 열린다.
-- [ ] 카카오/구글 로그인 CTA가 있다.
+- [ ] 구글 로그인 CTA가 있고, 카카오 CTA는 `NEXT_PUBLIC_AUTH_KAKAO_ENABLED` flag로만 노출된다.
 - [ ] 생활 단계 태그 선택 UI가 있다.
 - [ ] 로그인 전 선택한 생활 단계 값이 로그인 후 `profiles.life_stage`로 전달된다.
 - [ ] `product-05a-profile`에 대한 역방향 의존 없이 공용 profile action이 존재한다.
@@ -71,6 +71,7 @@ demo_step: "스플래시/온보딩"
 3. edge: 생활 단계 태그는 하나만 선택된다.
 4. edge: 선택 전 완료 버튼은 비활성이다.
 5. happy: 로그인 후 pending 생활 단계 값이 `profiles.life_stage`에 저장된다.
+6. edge: `NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false`일 때 카카오 CTA가 DOM에 렌더링되지 않는다.
 
 ## References
 
