@@ -89,6 +89,13 @@ export type Database = {
             foreignKeyName: "comments_dilemma_id_fkey"
             columns: ["dilemma_id"]
             isOneToOne: false
+            referencedRelation: "dilemma_vote_summaries"
+            referencedColumns: ["dilemma_id"]
+          },
+          {
+            foreignKeyName: "comments_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
             referencedRelation: "dilemmas"
             referencedColumns: ["id"]
           },
@@ -200,6 +207,13 @@ export type Database = {
             foreignKeyName: "followups_dilemma_id_fkey"
             columns: ["dilemma_id"]
             isOneToOne: true
+            referencedRelation: "dilemma_vote_summaries"
+            referencedColumns: ["dilemma_id"]
+          },
+          {
+            foreignKeyName: "followups_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: true
             referencedRelation: "dilemmas"
             referencedColumns: ["id"]
           },
@@ -271,6 +285,13 @@ export type Database = {
             foreignKeyName: "vote_options_dilemma_id_fkey"
             columns: ["dilemma_id"]
             isOneToOne: false
+            referencedRelation: "dilemma_vote_summaries"
+            referencedColumns: ["dilemma_id"]
+          },
+          {
+            foreignKeyName: "vote_options_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
             referencedRelation: "dilemmas"
             referencedColumns: ["id"]
           },
@@ -316,6 +337,13 @@ export type Database = {
             foreignKeyName: "votes_dilemma_id_fkey"
             columns: ["dilemma_id"]
             isOneToOne: false
+            referencedRelation: "dilemma_vote_summaries"
+            referencedColumns: ["dilemma_id"]
+          },
+          {
+            foreignKeyName: "votes_dilemma_id_fkey"
+            columns: ["dilemma_id"]
+            isOneToOne: false
             referencedRelation: "dilemmas"
             referencedColumns: ["id"]
           },
@@ -337,19 +365,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dilemma_vote_summaries: {
+        Row: {
+          buy_count: number | null
+          buy_ratio: number | null
+          dilemma_id: string | null
+          option_a_count: number | null
+          option_b_count: number | null
+          skip_count: number | null
+          skip_ratio: number | null
+          total_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_followup_candidates: {
-        Args: { p_now?: string }
+        Args: { now_ts?: string }
         Returns: {
+          days_overdue: number
           dilemma_id: string
           followup_due_at: string
           price: number
           product_name: string
           title: string
+          total_count: number
         }[]
       }
+      get_my_notification_candidates: {
+        Args: never
+        Returns: {
+          author_id: string
+          dilemma_id: string
+          kind: string
+        }[]
+      }
+      get_operator_notification_candidates: {
+        Args: never
+        Returns: {
+          author_id: string
+          dilemma_id: string
+          kind: string
+        }[]
+      }
+      vote_result_notification_threshold: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
