@@ -35,7 +35,12 @@ values (
   'unspecified',
   'worker'
 )
-on conflict (id) do nothing;
+on conflict (id) do update
+set
+  nickname = excluded.nickname,
+  birth_year = excluded.birth_year,
+  gender = excluded.gender,
+  life_stage = excluded.life_stage;
 
 insert into public.dilemmas (
   id,
