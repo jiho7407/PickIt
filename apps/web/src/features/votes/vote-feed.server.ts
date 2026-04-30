@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import {
+  LIFE_STAGE_OPTIONS,
+  isLifeStageValue,
+  type LifeStageValue,
+} from "@/features/onboarding/onboarding-trigger";
 import { getPublicUrl } from "@/lib/storage";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getDilemmaVoteSummaries } from "./summary.server";
@@ -15,9 +20,15 @@ type RawVoteOption = {
   position: number;
 };
 
+type RawAuthorRef = {
+  nickname: string;
+  life_stage: string | null;
+};
+
 type RawComment = {
   body: string;
   created_at: string;
+  author: RawAuthorRef | null;
 };
 
 type RawDilemma = {
@@ -29,9 +40,21 @@ type RawDilemma = {
   image_path: string | null;
   vote_type: string;
   created_at: string;
+  author: RawAuthorRef;
   vote_options: RawVoteOption[] | null;
   comments: RawComment[] | null;
 };
+
+const LIFE_STAGE_LABEL_BY_VALUE = new Map<string, string>(
+  LIFE_STAGE_OPTIONS.map((option) => [option.value, option.label]),
+);
+
+function lifeStageLabel(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+  return LIFE_STAGE_LABEL_BY_VALUE.get(value) ?? null;
+}
 
 function toPublicImageUrl(path: string | null, client: VoteFeedClient) {
   return path ? getPublicUrl(path, client) : null;
@@ -51,24 +74,46 @@ function toVoteOption(option: RawVoteOption, client: VoteFeedClient): VoteFeedOp
   };
 }
 
+export type VoteFeedFilter = {
+  stage?: LifeStageValue;
+};
+
+export function parseVoteFeedFilter(stage: string | string[] | undefined): VoteFeedFilter {
+  const value = Array.isArray(stage) ? stage[0] : stage;
+  if (value && isLifeStageValue(value)) {
+    return { stage: value };
+  }
+  return {};
+}
+
 export async function getPublicVoteFeedItems(
+  filter: VoteFeedFilter = {},
   client?: VoteFeedClient,
 ): Promise<VoteFeedItem[]> {
   const supabase = client ?? (await createServerSupabaseClient());
-  const { data, error } = await supabase
+  let query = supabase
     .from("dilemmas")
     .select(
-      "id,title,product_name,price,category,image_path,vote_type,created_at,vote_options(id,label,price,image_path,position),comments(body,created_at)",
+      "id,title,product_name,price,category,image_path,vote_type,created_at," +
+        "author:profiles!inner(nickname,life_stage)," +
+        "vote_options(id,label,price,image_path,position)," +
+        "comments(body,created_at,author:profiles(nickname))",
     )
     .eq("status", "open")
     .order("created_at", { ascending: false })
     .limit(20);
 
+  if (filter.stage) {
+    query = query.eq("author.life_stage", filter.stage);
+  }
+
+  const { data, error } = await query;
+
   if (error) {
     throw error;
   }
 
-  const rows = (data ?? []) as RawDilemma[];
+  const rows = (data ?? []) as unknown as RawDilemma[];
   const summaries = await getDilemmaVoteSummaries(
     rows.map((row) => row.id),
     supabase,
@@ -97,10 +142,14 @@ export async function getPublicVoteFeedItems(
       voteType: row.vote_type === "ab" ? "ab" : "buy_skip",
       totalVotes: summary?.total_count ?? 0,
       commentCount: sortedComments.length,
+      author: {
+        nickname: row.author.nickname,
+        lifeStageLabel: lifeStageLabel(row.author.life_stage),
+      },
       previewComment:
         firstComment ?
           {
-            authorName: "익명의 아나콘다",
+            authorName: firstComment.author?.nickname ?? "익명",
             body: firstComment.body,
           }
         : null,

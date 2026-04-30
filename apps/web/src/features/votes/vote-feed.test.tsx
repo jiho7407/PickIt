@@ -10,14 +10,15 @@ const sampleItems: VoteFeedItem[] = [
     title: "브라운 코트 사고 싶은데 면접용으로만 쓰고 안 입을까 봐 고민돼요...",
     productName: "브라운 코트",
     price: 277000,
-    category: "fashion",
+    category: "패션",
     imageUrl: null,
     createdAt: "2026-04-30T06:20:00.000Z",
     voteType: "buy_skip",
     totalVotes: 5,
     commentCount: 1,
+    author: { nickname: "면접앞둔취준생", lifeStageLabel: "취준생" },
     previewComment: {
-      authorName: "익명의 아나콘다",
+      authorName: "분당대학생",
       body: "코트 사기에는 좀 아깝지 않을까요?",
     },
   },
@@ -26,12 +27,13 @@ const sampleItems: VoteFeedItem[] = [
     title: "태블릿을 새로 사도 될까요?",
     productName: "태블릿",
     price: 890000,
-    category: "electronics",
+    category: "전자기기",
     imageUrl: "/sample/tablet.png",
     createdAt: "2026-04-30T06:16:00.000Z",
     voteType: "buy_skip",
     totalVotes: 3,
     commentCount: 0,
+    author: { nickname: "공대생A", lifeStageLabel: "대학생" },
     previewComment: null,
   },
   {
@@ -39,12 +41,13 @@ const sampleItems: VoteFeedItem[] = [
     title: "A랑 B 중 어떤 가방이 나을까요?",
     productName: "가방",
     price: 128000,
-    category: "fashion",
+    category: "패션",
     imageUrl: null,
     createdAt: "2026-04-30T06:10:00.000Z",
     voteType: "ab",
     totalVotes: 8,
     commentCount: 2,
+    author: { nickname: "직장인지원", lifeStageLabel: "직장인" },
     previewComment: null,
     options: [
       { id: "option-a", label: "A 가방", price: 128000, imageUrl: null, position: 1 },
@@ -54,21 +57,42 @@ const sampleItems: VoteFeedItem[] = [
 ];
 
 describe("VoteFeed", () => {
-  it("renders public vote cards in the provided home feed layout", () => {
+  it("renders public vote cards using profile-driven labels", () => {
     render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
 
     expect(screen.getByRole("heading", { name: "PICKIT" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "전체" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("link", { name: "전체" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText(sampleItems[0].title)).toBeInTheDocument();
     expect(screen.getByText(sampleItems[1].title)).toBeInTheDocument();
     expect(screen.getByText(sampleItems[2].title)).toBeInTheDocument();
     expect(screen.getAllByText("투표 진행 중")).toHaveLength(3);
-    expect(screen.getAllByText("대학생").length).toBeGreaterThanOrEqual(3);
-    expect(screen.queryByText("패션")).not.toBeInTheDocument();
-    expect(screen.queryByText("전자기기")).not.toBeInTheDocument();
+    expect(screen.getByText("면접앞둔취준생")).toBeInTheDocument();
+    expect(screen.getByText("공대생A")).toBeInTheDocument();
+    expect(screen.getByText("직장인지원")).toBeInTheDocument();
+    expect(screen.getAllByText("패션")).toHaveLength(2);
+    expect(screen.getByText("전자기기")).toBeInTheDocument();
+    expect(screen.getAllByText("취준생").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("대학생").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("renders a useful empty state when there are no public votes", () => {
+  it("renders the comment preview author from profile data", () => {
+    render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
+
+    expect(screen.getByText("분당대학생")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /면접앞둔취준생 투표 댓글 더보기/ }),
+    ).toHaveAttribute("href", "/votes/dilemma-1");
+  });
+
+  it("displays vote count alongside category and comment count", () => {
+    render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
+
+    expect(screen.getByText("투표 5")).toBeInTheDocument();
+    expect(screen.getByText("투표 3")).toBeInTheDocument();
+    expect(screen.getByText("투표 8")).toBeInTheDocument();
+  });
+
+  it("renders an empty state when there are no public votes", () => {
     render(<VoteFeed items={[]} quickVoteAction={vi.fn()} />);
 
     expect(screen.getByText("아직 올라온 소비 고민이 없어요.")).toBeInTheDocument();
@@ -93,7 +117,19 @@ describe("VoteFeed", () => {
     expect(screen.getAllByRole("button", { name: "참는 게 나아" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "A가 나아" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "B가 나아" })).toBeInTheDocument();
-    expect(screen.queryByText(/투표 \d+명/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/한마디 \d+/)).not.toBeInTheDocument();
+  });
+
+  it("renders the active stage filter chip and links others to query params", () => {
+    render(
+      <VoteFeed items={sampleItems} quickVoteAction={vi.fn()} activeStage="university" />,
+    );
+
+    expect(screen.getByRole("link", { name: "대학생" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("link", { name: "전체" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "취준생" })).toHaveAttribute(
+      "href",
+      "/?stage=job_seeker",
+    );
+    expect(screen.getByRole("link", { name: "직장인" })).toHaveAttribute("href", "/?stage=worker");
   });
 });
