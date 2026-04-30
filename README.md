@@ -83,6 +83,30 @@ pnpm db:types
 `apps/web/src/lib/database.types.ts`에 쓴다. `pnpm test:rls`는 local Supabase에
 연결해 RLS allow/deny 회귀 테스트를 실행한다.
 
+원격 preview Supabase project:
+
+- URL: `https://iuqfujdccqqekwuzoknk.supabase.co`
+- Project ref: `iuqfujdccqqekwuzoknk`
+- Dashboard: <https://supabase.com/dashboard/project/iuqfujdccqqekwuzoknk>
+
+원격 DB는 `supabase link --project-ref iuqfujdccqqekwuzoknk` 후
+`supabase db push`로 local migration set을 적용한다. 원격 키와 DB password,
+`SUPABASE_ACCESS_TOKEN`은 로컬 `.env` 또는 팀 비밀 저장소에만 둔다.
+`SUPABASE_SERVICE_ROLE_KEY`는 서버/테스트/admin 용도만 허용하며 client bundle에
+노출하지 않는다.
+
+### Figma
+
+Figma base file:
+
+- <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1>
+
+파일이 크므로 Planning 문서에는 고정 node id를 남기지 않는다. 각 `product-*`
+태스크 착수 직전에 필요한 폰 화면 프레임 3~5개, 모달/토스트 프레임, 텍스트와
+컬러 변경분을 카톡 또는 작업 스레드로 다시 전달받아 해당 태스크 References에만
+임시로 붙인다. Figma token 페이지가 확인되기 전까지는 Tailwind token을 기준으로
+구현하고, token 갭은 product 구현 중 발견 시 보정한다.
+
 ## 프로필/프론트엔드 담당자 안내
 
 프로필 담당자는 먼저 `DEVELOPMENT_SPLIT.md`를 읽는다.

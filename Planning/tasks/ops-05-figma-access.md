@@ -1,6 +1,6 @@
 ---
 id: ops-05-figma-access
-status: todo
+status: done
 sub: OPS
 layer: ops
 depends_on: []
@@ -26,10 +26,10 @@ demo_step: N/A
 
 ## Deliverables
 
-- [ ] 개발자 계정이 Figma 파일에 최소 뷰어 권한을 가진다.
-- [ ] Figma 파일 내 "화면 IA 섹션"과 "개별 폰 화면 프레임" 폴더가 구분돼 있다.
-- [ ] product 태스크 착수 시 프레임 전달에 쓸 채널(슬랙/Notion) 합의.
-- [ ] Tailwind 초기 토큰과 Figma 토큰 간 갭 목록 초안 작성.
+- [x] 개발자 계정이 Figma 파일에 최소 뷰어 권한을 가진다.
+- [x] Figma 파일 내 "화면 IA 섹션"과 "개별 폰 화면 프레임" 폴더가 구분돼 있다.
+- [x] product 태스크 착수 시 프레임 전달에 쓸 채널(카톡 또는 작업 스레드) 합의.
+- [x] Tailwind 초기 토큰과 Figma 토큰 간 갭 목록 초안 작성.
 
 ## Handoff Checklist (각 product 태스크 착수 직전 반복)
 
@@ -40,9 +40,16 @@ demo_step: N/A
 
 ## Acceptance Criteria
 
-- [ ] 개발자가 Figma 파일을 열 수 있다.
-- [ ] 전달 프로세스가 README 또는 STATE에 기록돼 있다.
-- [ ] 토큰 갭 목록이 product 태스크 착수 전에 참고 가능한 곳에 있다.
+- [x] 개발자가 Figma 파일을 열 수 있다.
+- [x] 전달 프로세스가 README 또는 STATE에 기록돼 있다.
+- [x] 토큰 갭 목록이 product 태스크 착수 전에 참고 가능한 곳에 있다.
+
+## Completion Notes
+
+- Base file: <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1>
+- 파일이 크므로 고정 node id를 Planning에 남기지 않는다.
+- 각 `product-*` 태스크 착수 직전에 필요한 폰 화면 프레임 3~5개와 모달/토스트 프레임을 다시 전달받는다.
+- 디자인 token 페이지가 별도로 확인되기 전까지는 Tailwind token을 기준으로 구현한다.
 
 ## References
 

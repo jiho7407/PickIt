@@ -62,9 +62,9 @@ Red-Green-Refactor 순서.
 | --- | --- | --- |
 | `ops-01-google-oauth-credentials` | todo | Google OAuth client id/secret 확보 |
 | `ops-02-kakao-oauth-credentials` | deferred | Kakao OAuth 키 (env flag 준비만, 실제 활성화는 후속) |
-| `ops-03-supabase-projects` | todo | Supabase preview/prod project 생성과 키 관리 |
+| `ops-03-supabase-projects` | done | Supabase preview/prod project 생성과 키 관리 |
 | `ops-04-vercel-project` | todo | Vercel 프로젝트 연결과 env 주입 |
-| `ops-05-figma-access` | todo | Figma 접근 권한, 화면 전달 프로세스 |
+| `ops-05-figma-access` | done | Figma 접근 권한, 화면 전달 프로세스 |
 | `infra-01-project-bootstrap` | todo | Next.js/Supabase/uv 프로젝트 기반 |
 | `infra-02-supabase-local-and-ci` | todo | Supabase local/CI/type-gen 기반 |
 | `infra-03-storage-setup` | todo | Storage 버킷/정책(이미지 업로드) |
