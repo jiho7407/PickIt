@@ -1,18 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import type { CookieOptions } from "@supabase/ssr";
 import type { Database } from "../database.types";
 import { createServerSupabaseClient } from "../supabase/server";
 import { anonymousSessionCookieSchema, anonymousSessionRowSchema } from "./schema";
+import {
+  ANONYMOUS_SESSION_COOKIE,
+  ANONYMOUS_SESSION_COOKIE_OPTIONS,
+  hashAnonymousSessionValue,
+} from "./anonymous-session-core";
 
-export const ANONYMOUS_SESSION_COOKIE = "pickit_anon_sid";
-export const ANONYMOUS_SESSION_COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: true,
-  sameSite: "lax",
-  maxAge: 60 * 60 * 24 * 180,
-  path: "/",
-} as const satisfies CookieOptions;
+export {
+  ANONYMOUS_SESSION_COOKIE,
+  ANONYMOUS_SESSION_COOKIE_OPTIONS,
+  hashAnonymousSessionValue,
+} from "./anonymous-session-core";
 
 type CookieStore = {
   get: (name: string) => string | undefined;
@@ -101,14 +102,6 @@ function getValidCookieValue(cookieStore: CookieStore) {
 
 function createSessionValue(deps: AnonymousSessionDependencies) {
   return deps.createSessionValue?.() ?? crypto.randomUUID();
-}
-
-export async function hashAnonymousSessionValue(sessionValue: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(sessionValue));
-
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
 }
 
 export async function ensureAnonymousSession(

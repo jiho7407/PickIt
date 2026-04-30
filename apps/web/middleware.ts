@@ -1,8 +1,11 @@
 import type { NextRequest } from "next/server";
+import { ensureMiddlewareAnonymousSession } from "./src/lib/session/anonymous-session-middleware";
 import { updateSession } from "./src/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return updateSession(request);
+  const { response, userId } = await updateSession(request);
+
+  return ensureMiddlewareAnonymousSession(request, response, userId);
 }
 
 export const config = {

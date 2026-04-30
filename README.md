@@ -80,9 +80,8 @@ pnpm db:types
 ```
 
 `pnpm db:types`는 local Supabase 스키마에서 TypeScript 타입을 생성해
-`apps/web/src/lib/database.types.ts`에 쓴다. RLS 테스트 케이스는
-`data-05-rls-tests`에서 추가하며, 현재는 `apps/web/tests/rls/` 위치와 실행
-명령만 예약되어 있다.
+`apps/web/src/lib/database.types.ts`에 쓴다. `pnpm test:rls`는 local Supabase에
+연결해 RLS allow/deny 회귀 테스트를 실행한다.
 
 ## 프로필/프론트엔드 담당자 안내
 
