@@ -1,6 +1,6 @@
 ---
 id: data-04-vote-summary-views
-status: todo
+status: done
 sub: BE
 layer: data
 depends_on: [data-02-vote-comment-schema, data-03-followup-schema]

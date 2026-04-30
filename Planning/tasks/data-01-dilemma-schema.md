@@ -1,6 +1,6 @@
 ---
 id: data-01-dilemma-schema
-status: todo
+status: done
 sub: BE
 layer: data
 depends_on: [infra-02-supabase-local-and-ci]

@@ -1,6 +1,6 @@
 ---
 id: data-02-vote-comment-schema
-status: todo
+status: done
 sub: BE
 layer: data
 depends_on: [data-01-dilemma-schema]

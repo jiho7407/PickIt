@@ -1,6 +1,6 @@
 ---
 id: product-00-splash-onboarding-flow
-status: todo
+status: in_progress
 sub: FE
 layer: product
 depends_on: [ops-05-figma-access, infra-04-auth-providers, data-01-dilemma-schema]
@@ -20,6 +20,33 @@ demo_step: "스플래시/온보딩"
 - 홈 투표 카드에서 상세 화면 진입
 - 프로필 화면 진입
 - 투표 만들기 버튼 진입
+
+### Current Implementation Scope Override
+
+2026-04-30 user direction supersedes the original broader onboarding trigger
+plan for this branch:
+
+- Implement only the five screens explicitly provided from Figma:
+  1. Splash
+  2. Onboarding slide 1
+  3. Onboarding slide 2
+  4. Life-stage/tag selection with no selection
+  5. Life-stage/tag selection with one selected tag
+- Do not add a home/feed preview, placeholder content, marketing copy, empty
+  state, or any extra route/screen that was not provided.
+- Treat the phone status bar in Figma as device chrome and omit it from the web
+  implementation.
+- Keep Google/Kakao login as a product-00 mock transition into the tag
+  selection screen. Real OAuth, signup, account creation, and callback behavior
+  belong to auth tasks, not this visual flow.
+- Render Kakao and Google CTAs to match the provided layout even if the provider
+  is not yet operational.
+- For the onboarding phone artwork, use exact exported frame PNG assets from
+  Figma. Do not rebuild the phone frame, side buttons, internal screenshots, or
+  bottom fade with CSS/SVG because small positioning differences are visible.
+- The current exported artwork source nodes are:
+  - Onboarding image 1: <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1?node-id=215-6912>
+  - Onboarding image 2: <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1?node-id=215-6910>
 
 ## Files
 
@@ -56,23 +83,27 @@ demo_step: "스플래시/온보딩"
 
 ## Acceptance Criteria
 
-- [ ] 첫 방문자는 홈 투표 피드를 볼 수 있다.
-- [ ] 의미 있는 액션 시 온보딩/로그인 유도가 열린다.
-- [ ] 구글 로그인 CTA가 있고, 카카오 CTA는 `NEXT_PUBLIC_AUTH_KAKAO_ENABLED` flag로만 노출된다.
-- [ ] 생활 단계 태그 선택 UI가 있다.
-- [ ] 로그인 전 선택한 생활 단계 값이 로그인 후 `profiles.life_stage`로 전달된다.
-- [ ] `product-05a-profile`에 대한 역방향 의존 없이 공용 profile action이 존재한다.
-- [ ] Figma 구현 시점에 개별 화면 프레임을 다시 확인한다.
+- [x] 첫 방문자는 스플래시 후 제공된 온보딩 화면으로 자연스럽게 진입한다.
+- [x] 제공되지 않은 홈/피드/프리뷰 화면이 렌더링되지 않는다.
+- [x] 구글/카카오 로그인 CTA가 제공된 레이아웃대로 노출된다.
+- [x] 생활 단계 태그 선택 UI가 있다.
+- [x] 로그인 CTA는 product-00 범위에서 태그 선택 화면으로 mock 전환된다.
+- [x] 로그인 전 선택한 생활 단계 값이 로그인 후 `profiles.life_stage`로 전달될 수 있는 공용 action/pending consume 경로가 존재한다.
+- [x] `product-05a-profile`에 대한 역방향 의존 없이 공용 profile action이 존재한다.
+- [x] Figma 구현 시점에 개별 화면 프레임을 다시 확인한다.
+- [x] 온보딩 phone artwork는 Figma 묶음 프레임을 PNG asset으로 사용한다.
 
 ## Test Cases
 
-1. happy: 홈 진입 시 온보딩이 자동으로 전체 화면을 막지 않는다.
-2. happy: 투표 버튼 클릭 시 온보딩/로그인 유도가 열린다.
+1. happy: 첫 진입 시 스플래시가 보이고 제공되지 않은 홈 피드가 보이지 않는다.
+2. happy: 스플래시 후 온보딩 로그인 CTA가 보인다.
 3. edge: 생활 단계 태그는 하나만 선택된다.
 4. edge: 선택 전 완료 버튼은 비활성이다.
-5. happy: 로그인 후 pending 생활 단계 값이 `profiles.life_stage`에 저장된다.
-6. edge: `NEXT_PUBLIC_AUTH_KAKAO_ENABLED=false`일 때 카카오 CTA가 DOM에 렌더링되지 않는다.
+5. happy: product-00 mock 로그인 클릭 시 태그 선택 화면으로 이동한다.
+6. happy: 로그인 후 pending 생활 단계 값이 `profiles.life_stage`에 저장될 수 있다.
 
 ## References
 
 - `../ONE_PAGER.md §11`
+- Splash frame: <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1?node-id=274-7668>
+- Onboarding frame: <https://www.figma.com/design/wmYEX4Dwx7ohz93MklwAiQ/Ampersand_-Batch1?node-id=274-7669>

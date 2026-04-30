@@ -1,6 +1,6 @@
 ---
 id: data-03-followup-schema
-status: todo
+status: done
 sub: BE
 layer: data
 depends_on: [data-01-dilemma-schema]

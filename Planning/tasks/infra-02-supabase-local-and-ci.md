@@ -1,6 +1,6 @@
 ---
 id: infra-02-supabase-local-and-ci
-status: todo
+status: done
 sub: INFRA
 layer: infra
 depends_on: [infra-01-project-bootstrap]

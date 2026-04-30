@@ -94,6 +94,18 @@ that plainly in the handoff.
   foundation tasks.
 - Figma node IDs are not permanent references. Re-check the relevant screen
   frame right before implementing a product task.
+- Implement only the screens, states, and interactions explicitly provided by
+  the user or the active task's Figma frames. Do not invent or add extra pages,
+  placeholder screens, feed previews, marketing sections, empty states, or
+  navigation surfaces that were not provided.
+- When a Figma frame contains grouped bitmap-like artwork, export and use the
+  exact frame/image asset. Do not recreate phone mockups, device buttons,
+  product screenshots, logos, or masked fades with hand-written CSS/SVG unless
+  the active task explicitly asks for editable vector/code-native artwork.
+- If auth/signup is outside the active task, keep login CTAs as a local mock
+  transition to the next provided screen. Do not wire OAuth, account creation,
+  or extra post-login screens into a product UI task unless the task file
+  explicitly includes that scope.
 - If Figma is unavailable, implement the MVP wireframe implied by the task and
   keep styling minimal.
 - Do not introduce a large component library unless the active task requires it.

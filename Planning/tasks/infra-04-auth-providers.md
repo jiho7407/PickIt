@@ -1,6 +1,6 @@
 ---
 id: infra-04-auth-providers
-status: todo
+status: done
 sub: INFRA
 layer: infra
 depends_on: [ops-01-google-oauth-credentials, infra-02-supabase-local-and-ci, data-01-dilemma-schema]
