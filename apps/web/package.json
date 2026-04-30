@@ -6,12 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "test": "vitest run",
+    "test": "vitest run app src",
     "test:e2e": "playwright test",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:types": "../../scripts/qa/generate_types.sh",
-    "test:rls": "vitest run tests/rls --passWithNoTests"
+    "test:rls": "vitest run tests/rls"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

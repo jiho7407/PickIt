@@ -1,7 +1,20 @@
 # RLS Tests
 
-This directory is reserved for Supabase RLS integration tests.
+This directory contains Supabase local RLS integration tests.
 
-The actual policy test cases are introduced in `data-05-rls-tests`. Until then,
-`pnpm test:rls` is wired to the runner with `--passWithNoTests` so CI can keep
-the command stable.
+Run them after the local stack is started and `.env.test` points at the local
+Supabase API:
+
+```bash
+supabase start
+pnpm test:rls
+```
+
+The tests create disposable auth users, dilemmas, votes, comments, followups,
+anonymous sessions, and storage objects, then remove them during teardown.
+
+If a run is interrupted, reset local fixtures with:
+
+```bash
+node --experimental-strip-types ../../scripts/qa/reset_rls_fixtures.ts
+```
