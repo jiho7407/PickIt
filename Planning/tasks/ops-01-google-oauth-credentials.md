@@ -1,6 +1,6 @@
 ---
 id: ops-01-google-oauth-credentials
-status: todo
+status: done
 sub: OPS
 layer: ops
 depends_on: []
@@ -26,15 +26,15 @@ demo_step: N/A
 
 ## Deliverables
 
-- [ ] Google Cloud 프로젝트 생성 또는 기존 프로젝트 지정
-- [ ] OAuth 동의 화면 구성(앱 이름, 지원 이메일, 개발자 연락처)
-- [ ] OAuth 2.0 Client ID(Web application) 발급
-- [ ] Authorized redirect URIs 등록:
+- [x] Google Cloud 프로젝트 생성 또는 기존 프로젝트 지정
+- [x] OAuth 동의 화면 구성(앱 이름, 지원 이메일, 개발자 연락처)
+- [x] OAuth 2.0 Client ID(Web application) 발급
+- [x] Authorized redirect URIs 등록:
   - `http://127.0.0.1:54321/auth/v1/callback` (Supabase local)
   - `{SUPABASE_PROJECT_URL}/auth/v1/callback` (preview/prod, `ops-03` 완료 후 등록)
-- [ ] `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`을 팀 비밀 저장소(1Password 등)에 보관
-- [ ] Supabase local 또는 preview project Auth → Google provider에 client id/secret 입력
-- [ ] `apps/web/.env.example` 템플릿에 env 키 반영(실제 값 금지)
+- [x] `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`을 팀 비밀 저장소(1Password 등)에 보관
+- [x] Supabase local 또는 preview project Auth → Google provider에 client id/secret 입력
+- [x] `apps/web/.env.example` 템플릿에 env 키 반영(실제 값 금지)
 
 ## Dependency Note
 
@@ -42,10 +42,17 @@ demo_step: N/A
 
 ## Acceptance Criteria
 
-- [ ] client id/secret이 팀 비밀 저장소에 있다.
-- [ ] Supabase local 또는 preview project에서 Google provider로 수동 로그인 테스트가 통과한다.
-- [ ] `.env.example`에 필수 env 키가 있다(값은 비어 있음).
-- [ ] redirect URI 목록이 README 또는 STATE에 문서화된다.
+- [x] client id/secret이 팀 비밀 저장소에 있다.
+- [x] Supabase local 또는 preview project에서 Google provider로 수동 로그인 테스트가 통과한다.
+- [x] `.env.example`에 필수 env 키가 있다(값은 비어 있음).
+- [x] redirect URI 목록이 README 또는 STATE에 문서화된다.
+
+## Completion Notes
+
+- Google OAuth authorize smoke against preview Supabase returned HTTP 302 to `accounts.google.com`.
+- Local callback URI: `http://127.0.0.1:54321/auth/v1/callback`
+- Preview callback URI: `https://iuqfujdccqqekwuzoknk.supabase.co/auth/v1/callback`
+- Secrets stay in root `.env`, `apps/web/.env.local`, or the team secret store only.
 
 ## References
 

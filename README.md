@@ -95,6 +95,18 @@ pnpm db:types
 `SUPABASE_SERVICE_ROLE_KEY`는 서버/테스트/admin 용도만 허용하며 client bundle에
 노출하지 않는다.
 
+### Auth
+
+Google OAuth는 1차 로그인 수단이다. Google Cloud OAuth client에는 아래 Supabase
+callback URI를 등록한다.
+
+- Local: `http://127.0.0.1:54321/auth/v1/callback`
+- Preview: `https://iuqfujdccqqekwuzoknk.supabase.co/auth/v1/callback`
+
+local Supabase Auth는 root `.env`의 `GOOGLE_OAUTH_CLIENT_ID`와
+`GOOGLE_OAUTH_CLIENT_SECRET`을 `supabase/config.toml`에서 읽는다. 원격 Supabase
+Auth provider에는 같은 client id/secret을 dashboard에서 입력한다.
+
 ### Figma
 
 Figma base file:
