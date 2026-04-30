@@ -1,6 +1,6 @@
 ---
 id: infra-03-storage-setup
-status: todo
+status: done
 sub: INFRA
 layer: infra
 depends_on: [infra-02-supabase-local-and-ci]

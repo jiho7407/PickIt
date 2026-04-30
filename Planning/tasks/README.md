@@ -65,17 +65,17 @@ Red-Green-Refactor 순서.
 | `ops-03-supabase-projects` | done | Supabase preview/prod project 생성과 키 관리 |
 | `ops-04-vercel-project` | todo | Vercel 프로젝트 연결과 env 주입 |
 | `ops-05-figma-access` | done | Figma 접근 권한, 화면 전달 프로세스 |
-| `infra-01-project-bootstrap` | todo | Next.js/Supabase/uv 프로젝트 기반 |
-| `infra-02-supabase-local-and-ci` | todo | Supabase local/CI/type-gen 기반 |
-| `infra-03-storage-setup` | todo | Storage 버킷/정책(이미지 업로드) |
-| `infra-04-auth-providers` | todo | Supabase Auth(Google/Kakao) + 세션 미들웨어 |
-| `infra-05-anonymous-session` | todo | 익명 투표 세션 쿠키/DB 연결 |
+| `infra-01-project-bootstrap` | done | Next.js/Supabase/uv 프로젝트 기반 |
+| `infra-02-supabase-local-and-ci` | done | Supabase local/CI/type-gen 기반 |
+| `infra-03-storage-setup` | done | Storage 버킷/정책(이미지 업로드) |
+| `infra-04-auth-providers` | done | Supabase Auth(Google/Kakao) + 세션 미들웨어 |
+| `infra-05-anonymous-session` | done | 익명 투표 세션 쿠키/DB 연결 |
 | `infra-06-deployment-preview` | todo | Vercel/Supabase preview 배포와 운영 env 점검 |
-| `data-01-dilemma-schema` | todo | 고민/프로필 schema |
-| `data-02-vote-comment-schema` | todo | 투표/한마디 schema |
-| `data-03-followup-schema` | todo | 7일 후 회고 schema |
-| `data-04-vote-summary-views` | todo | 투표 요약 view, 후보 조회 RPC |
-| `data-05-rls-tests` | todo | RLS 통합 테스트 스위트 |
+| `data-01-dilemma-schema` | done | 고민/프로필 schema |
+| `data-02-vote-comment-schema` | done | 투표/한마디 schema |
+| `data-03-followup-schema` | done | 7일 후 회고 schema |
+| `data-04-vote-summary-views` | done | 투표 요약 view, 후보 조회 RPC |
+| `data-05-rls-tests` | done | RLS 통합 테스트 스위트 |
 | `product-00-splash-onboarding-flow` | todo | 스플래시/온보딩/소셜 로그인 진입 |
 | `product-01-home-vote-feed` | todo | 홈 = 투표 피드 |
 | `product-02-vote-detail-flow` | todo | 투표 상세: 살지/말지, A/B |

@@ -1,6 +1,6 @@
 ---
 id: data-05-rls-tests
-status: todo
+status: done
 sub: QA
 layer: data
 depends_on: [data-01-dilemma-schema, data-02-vote-comment-schema, data-03-followup-schema, data-04-vote-summary-views, infra-03-storage-setup, infra-04-auth-providers, infra-05-anonymous-session]

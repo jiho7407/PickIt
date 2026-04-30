@@ -1,6 +1,6 @@
 ---
 id: infra-05-anonymous-session
-status: todo
+status: done
 sub: INFRA
 layer: infra
 depends_on: [data-02-vote-comment-schema, infra-04-auth-providers]

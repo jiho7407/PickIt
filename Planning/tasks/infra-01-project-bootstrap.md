@@ -1,6 +1,6 @@
 ---
 id: infra-01-project-bootstrap
-status: todo
+status: done
 sub: INFRA
 layer: infra
 depends_on: []
