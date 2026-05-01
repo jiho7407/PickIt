@@ -199,12 +199,7 @@ export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
       <div className="px-5 py-4">
         <div className="space-y-2">
           <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold leading-[1.3] text-[#1fa89f]">투표 진행 중</p>
-              <span className="rounded-full bg-[#eef2f7] px-2 py-0.5 text-[11px] font-medium leading-[1.3] text-[#64748b]">
-                {item.category}
-              </span>
-            </div>
+            <p className="text-xs font-semibold leading-[1.3] text-[#1fa89f]">투표 진행 중</p>
             <div className="flex items-center gap-2">
               <p className="text-xs font-semibold leading-[1.3] text-[#334155]">
                 {item.author.nickname}

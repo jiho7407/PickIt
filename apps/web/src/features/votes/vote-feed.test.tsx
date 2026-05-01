@@ -69,10 +69,10 @@ describe("VoteFeed", () => {
     expect(screen.getByText("면접앞둔취준생")).toBeInTheDocument();
     expect(screen.getByText("공대생A")).toBeInTheDocument();
     expect(screen.getByText("직장인지원")).toBeInTheDocument();
-    expect(screen.getAllByText("패션")).toHaveLength(2);
-    expect(screen.getByText("전자기기")).toBeInTheDocument();
     expect(screen.getAllByText("취준생").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("대학생").length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText("패션")).not.toBeInTheDocument();
+    expect(screen.queryByText("전자기기")).not.toBeInTheDocument();
   });
 
   it("renders the comment preview author from profile data", () => {

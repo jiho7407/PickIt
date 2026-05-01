@@ -86,9 +86,9 @@ export function VoteFeed({ items, quickVoteAction, activeStage }: VoteFeedProps)
       className="mx-auto min-h-dvh w-full max-w-[360px] bg-white text-[#0f172a] shadow-[0_0_0_1px_rgba(15,23,42,0.04)]"
     >
       <header className="sticky top-0 z-10 bg-white">
-        <div className="flex h-[94px] items-end justify-between px-5 pb-2.5">
+        <div className="flex h-14 items-center justify-between px-5">
           <h1 className="sr-only">PICKIT</h1>
-          <PickItLogo className="h-6 w-[85px] text-[#32cfc6]" />
+          <PickItLogo className="h-6 w-[85px]" />
           <Link
             href="/notifications"
             aria-label="알림"
