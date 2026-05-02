@@ -12,7 +12,8 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/features/votes/vote-actions", () => ({
-  castDetailVote: vi.fn(),
+  recordDetailVote: vi.fn(),
+  submitDetailComment: vi.fn(),
 }));
 
 vi.mock("@/features/votes/vote-detail.server", () => ({

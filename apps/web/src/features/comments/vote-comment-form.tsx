@@ -1,40 +1,34 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { SendArrowIcon } from "@/features/votes/icons";
-import type { DetailVoteActionState } from "@/features/votes/vote-actions";
-
-export type VoteSelection =
-  | {
-      kind: "choice";
-      value: "buy" | "skip";
-    }
-  | {
-      kind: "option";
-      optionId: string;
-    };
+import type { DetailCommentActionState } from "@/features/votes/vote-actions";
 
 type VoteCommentFormProps = {
   action: (
-    state: DetailVoteActionState,
+    state: DetailCommentActionState,
     formData: FormData,
-  ) => DetailVoteActionState | Promise<DetailVoteActionState>;
+  ) => DetailCommentActionState | Promise<DetailCommentActionState>;
   dilemmaId: string;
-  selection: VoteSelection;
 };
 
-export function VoteCommentForm({ action, dilemmaId, selection }: VoteCommentFormProps) {
+export function VoteCommentForm({ action, dilemmaId }: VoteCommentFormProps) {
   const [state, formAction, pending] = useActionState(action, { status: "idle" });
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  useEffect(() => {
+    if (state.status === "success") {
+      formRef.current?.reset();
+    }
+  }, [state]);
 
   return (
     <form
+      ref={formRef}
       action={formAction}
       className="sticky bottom-0 z-20 border-t border-[#f1f5f9] bg-white px-5 py-3"
     >
       <input type="hidden" name="dilemmaId" value={dilemmaId} />
-      {selection.kind === "choice" ?
-        <input type="hidden" name="choice" value={selection.value} />
-      : <input type="hidden" name="optionId" value={selection.optionId} />}
       <div className="flex gap-2">
         <input
           name="comment"
@@ -45,7 +39,7 @@ export function VoteCommentForm({ action, dilemmaId, selection }: VoteCommentFor
         <button
           type="submit"
           disabled={pending}
-          aria-label="투표와 댓글 제출"
+          aria-label="댓글 등록"
           className="grid h-[51px] w-[51px] shrink-0 place-items-center rounded-xl bg-[#32cfc6] text-white transition disabled:bg-[#dfe5ed] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
         >
           <SendArrowIcon className="h-6 w-6" />

@@ -51,7 +51,7 @@ describe("CreateVoteForm", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "다음" })).toBeEnabled());
   });
 
-  it("allows the flow to continue when storage upload fails after image selection", async () => {
+  it("surfaces an error and blocks the next step when storage upload fails", async () => {
     const user = userEvent.setup();
     vi.mocked(uploadDilemmaImage).mockRejectedValue(new Error("not signed in"));
     render(<CreateVoteForm action={vi.fn()} />);
@@ -63,8 +63,10 @@ describe("CreateVoteForm", () => {
     await user.upload(screen.getByLabelText("이미지 업로드"), file);
 
     await waitFor(() => expect(uploadDilemmaImage).toHaveBeenCalledWith(file));
-    await waitFor(() => expect(screen.getByRole("button", { name: "다음" })).toBeEnabled());
-    expect(screen.queryByText("이미지를 업로드하지 못했어요.")).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText(/이미지를 업로드하지 못했어요/)).toBeInTheDocument(),
+    );
+    expect(screen.getByRole("button", { name: "다음" })).toBeDisabled();
   });
 
   it("sets price to 50,000 won and changes it by 10,000 won", async () => {

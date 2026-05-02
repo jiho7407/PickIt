@@ -102,7 +102,7 @@ export type Database = {
           {
             foreignKeyName: "comments_vote_id_fkey"
             columns: ["vote_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "votes"
             referencedColumns: ["id"]
           },

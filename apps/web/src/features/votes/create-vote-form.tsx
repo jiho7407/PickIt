@@ -561,7 +561,7 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
     };
   }, []);
 
-  const hasImage = imagePreviewUrl !== null;
+  const hasImage = imagePreviewUrl !== null && imagePath.length > 0;
   const hasDetails = productName.trim().length > 0 && price > 0;
   const hasSituation =
     situation.trim().length >= MIN_SITUATION_LENGTH && selectedCategories.length > 0;
@@ -600,9 +600,19 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
     try {
       const result = await uploadDilemmaImage(file);
       setImagePath(result.path);
-    } catch {
+    } catch (error) {
+      const fallback =
+        "이미지를 업로드하지 못했어요. 로그인 상태를 확인하고 다시 시도해주세요.";
+      const message = error instanceof Error && error.message ? error.message : fallback;
+      console.error("[uploadDilemmaImage] failed", message);
       setImagePath("");
-      setUploadError(null);
+      setImagePreviewUrl(null);
+      if (previousObjectUrl.current) {
+        URL.revokeObjectURL(previousObjectUrl.current);
+        previousObjectUrl.current = null;
+      }
+      setUploadError(fallback);
+      event.target.value = "";
     } finally {
       setIsUploading(false);
     }

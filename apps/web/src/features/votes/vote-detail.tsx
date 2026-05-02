@@ -3,20 +3,37 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { VoteCommentForm, type VoteSelection } from "@/features/comments/vote-comment-form";
-import type { DetailVoteActionState } from "./vote-actions";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { VoteCommentForm } from "@/features/comments/vote-comment-form";
+import type {
+  DetailCommentActionState,
+  DetailVoteActionState,
+} from "./vote-actions";
 import { AbVotePanel } from "./ab-vote-panel";
 import { BuySkipVotePanel } from "./buy-skip-vote-panel";
 import { ChevronLeftIcon } from "./icons";
 import type { VoteDetailComment, VoteDetailItem } from "./vote-detail.server";
 
+export type VoteSelection =
+  | {
+      kind: "choice";
+      value: "buy" | "skip";
+    }
+  | {
+      kind: "option";
+      optionId: string;
+    };
+
 type VoteDetailProps = {
   detail: VoteDetailItem;
-  voteAction: (
+  recordVoteAction: (
     state: DetailVoteActionState,
     formData: FormData,
   ) => DetailVoteActionState | Promise<DetailVoteActionState>;
+  submitCommentAction: (
+    state: DetailCommentActionState,
+    formData: FormData,
+  ) => DetailCommentActionState | Promise<DetailCommentActionState>;
 };
 
 type BuySkipSelection = Extract<VoteSelection, { kind: "choice" }>;
@@ -170,31 +187,69 @@ function CommentsSection({ comments }: { comments: VoteDetailComment[] }) {
   );
 }
 
-function defaultSelection(detail: VoteDetailItem): VoteSelection {
+function leadingSelection(detail: VoteDetailItem): VoteSelection | null {
   if (detail.voteType === "ab") {
     const [optionA, optionB] = detail.options;
-    const option =
-      detail.summary.optionBRatio > detail.summary.optionARatio ? optionB ?? optionA : optionA;
-    return { kind: "option", optionId: option?.id ?? "" };
+    if (!optionA || !optionB) {
+      return null;
+    }
+    const winner = detail.summary.optionBRatio > detail.summary.optionARatio ? optionB : optionA;
+    return { kind: "option", optionId: winner.id };
   }
 
+  if (detail.summary.totalCount === 0) {
+    return null;
+  }
   return {
     kind: "choice",
     value: detail.summary.skipRatio > detail.summary.buyRatio ? "skip" : "buy",
   };
 }
 
-function hasValidSelection(selection: VoteSelection) {
-  return selection.kind === "choice" || selection.optionId.length > 0;
-}
+export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: VoteDetailProps) {
+  const fallbackSelection = useMemo(() => leadingSelection(detail), [detail]);
+  const [voted, setVoted] = useState(detail.hasVoted);
+  const [mySelection, setMySelection] = useState<VoteSelection | null>(
+    detail.hasVoted ? fallbackSelection : null,
+  );
+  const [voteFeedback, setVoteFeedback] = useState<DetailVoteActionState>({ status: "idle" });
+  const [isPending, startTransition] = useTransition();
 
-export function VoteDetail({ detail, voteAction }: VoteDetailProps) {
-  const initialSelection = useMemo(() => defaultSelection(detail), [detail]);
-  const [selection, setSelection] = useState<VoteSelection>(initialSelection);
-  const selectedChoice: BuySkipSelection =
-    selection.kind === "choice" ? selection : { kind: "choice", value: "buy" };
-  const selectedOption: AbSelection =
-    selection.kind === "option" ? selection : { kind: "option", optionId: "" };
+  useEffect(() => {
+    setVoted(detail.hasVoted);
+    setMySelection(detail.hasVoted ? fallbackSelection : null);
+  }, [detail.hasVoted, fallbackSelection]);
+
+  const displayedSelection = mySelection ?? fallbackSelection;
+  const buySkipDisplay: BuySkipSelection =
+    displayedSelection?.kind === "choice" ? displayedSelection : { kind: "choice", value: "buy" };
+  const abDisplay: AbSelection =
+    displayedSelection?.kind === "option" ? displayedSelection : { kind: "option", optionId: "" };
+
+  function handleSelect(next: VoteSelection) {
+    const previousSelection = mySelection;
+    const previousVoted = voted;
+    setMySelection(next);
+    setVoted(true);
+    setVoteFeedback({ status: "idle" });
+
+    const formData = new FormData();
+    formData.set("dilemmaId", detail.id);
+    if (next.kind === "choice") {
+      formData.set("choice", next.value);
+    } else {
+      formData.set("optionId", next.optionId);
+    }
+
+    startTransition(async () => {
+      const result = await recordVoteAction({ status: "idle" }, formData);
+      setVoteFeedback(result);
+      if (result.status !== "success") {
+        setMySelection(previousSelection);
+        setVoted(previousVoted);
+      }
+    });
+  }
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-[360px] bg-white text-[#0f172a] shadow-[0_0_0_1px_rgba(15,23,42,0.04)]">
@@ -213,34 +268,45 @@ export function VoteDetail({ detail, voteAction }: VoteDetailProps) {
 
       <div className="h-2 bg-[#f8faff]" />
       <section className="bg-white">
-        <div className="px-5 pb-2 pt-6">
-          <h2 className="text-base font-semibold leading-[1.3] text-[#0f172a]">투표 결과</h2>
+        <div className="flex items-center justify-between px-5 pb-2 pt-6">
+          <h2 className="text-base font-semibold leading-[1.3] text-[#0f172a]">투표하기</h2>
+          {voted ?
+            <span className="rounded-full bg-[#e8fafa] px-2 py-1 text-xs font-semibold text-[#32cfc6]">
+              투표 완료 · 다시 눌러 변경 가능
+            </span>
+          : <span className="text-xs leading-[1.3] text-[#94a3b8]">
+              항목을 선택하면 바로 반영돼요
+            </span>
+          }
         </div>
-        <div className="px-5 pb-8 pt-4">
+        <div className="px-5 pb-8 pt-4" aria-busy={isPending}>
           {detail.voteType === "ab" ?
             <AbVotePanel
               options={detail.options}
               optionARatio={detail.summary.optionARatio}
               optionBRatio={detail.summary.optionBRatio}
               totalCount={detail.summary.totalCount}
-              selected={selectedOption}
-              onSelect={setSelection}
+              selected={abDisplay}
+              onSelect={handleSelect}
             />
           : <BuySkipVotePanel
               buyRatio={detail.summary.buyRatio}
               skipRatio={detail.summary.skipRatio}
               totalCount={detail.summary.totalCount}
-              selected={selectedChoice}
-              onSelect={setSelection}
+              selected={buySkipDisplay}
+              onSelect={handleSelect}
             />}
+          {voteFeedback.status === "error" && voteFeedback.message ?
+            <p role="alert" className="mt-3 text-xs leading-[1.3] text-[#ff6842]">
+              {voteFeedback.message}
+            </p>
+          : null}
         </div>
       </section>
 
       <div className="h-2 bg-[#f8faff]" />
       <CommentsSection comments={detail.comments} />
-      {hasValidSelection(selection) ?
-        <VoteCommentForm action={voteAction} dilemmaId={detail.id} selection={selection} />
-      : null}
+      <VoteCommentForm action={submitCommentAction} dilemmaId={detail.id} />
     </main>
   );
 }

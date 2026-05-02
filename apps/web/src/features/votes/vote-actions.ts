@@ -1,11 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getOrCreateAnonymousSessionId } from "@/lib/session/anonymous-session";
+import {
+  getAnonymousSessionIdIfPresent,
+  getOrCreateAnonymousSessionId,
+} from "@/lib/session/anonymous-session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { voteChoiceSchema, voteCommentSchema } from "./schema";
 
 export type DetailVoteActionState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+};
+
+export type DetailCommentActionState = {
   status: "idle" | "success" | "error";
   message?: string;
 };
@@ -18,6 +26,11 @@ function readRequiredFormValue(formData: FormData, key: string) {
   }
 
   return value;
+}
+
+function readOptionalFormValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" && value.length > 0 ? value : null;
 }
 
 export async function castQuickVote(formData: FormData) {
@@ -63,88 +76,94 @@ export async function castQuickVote(formData: FormData) {
   revalidatePath("/");
 }
 
-function readOptionalFormValue(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" && value.length > 0 ? value : null;
+type VoterIdentity =
+  | { kind: "authenticated"; userId: string }
+  | { kind: "anonymous"; sessionId: string };
+
+async function resolveVoterIdentity(): Promise<VoterIdentity> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    return { kind: "authenticated", userId: user.id };
+  }
+
+  const sessionId = await getOrCreateAnonymousSessionId();
+  return { kind: "anonymous", sessionId };
 }
 
-function duplicateVoteState(): DetailVoteActionState {
-  return {
-    status: "error",
-    message: "이미 이 투표에 참여했어요.",
-  };
+async function findExistingVoteId(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  dilemmaId: string,
+  identity: VoterIdentity,
+): Promise<string | null> {
+  let query = supabase.from("votes").select("id").eq("dilemma_id", dilemmaId);
+
+  if (identity.kind === "authenticated") {
+    query = query.eq("voter_id", identity.userId);
+  } else {
+    query = query.eq("anonymous_session_id", identity.sessionId);
+  }
+
+  const { data } = await query.maybeSingle();
+  return data?.id ?? null;
 }
 
-export async function castDetailVote(
+export async function recordDetailVote(
   _state: DetailVoteActionState,
   formData: FormData,
 ): Promise<DetailVoteActionState> {
   const dilemmaId = readRequiredFormValue(formData, "dilemmaId");
   const optionId = readOptionalFormValue(formData, "optionId");
   const rawChoice = readOptionalFormValue(formData, "choice");
-  const rawComment = readOptionalFormValue(formData, "comment");
-  const commentBody =
-    rawComment && rawComment.trim().length > 0 ?
-      voteCommentSchema.parse({ body: rawComment.trim() }).body
-    : null;
   const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const identity = await resolveVoterIdentity();
 
-  console.info("[castDetailVote]", {
+  console.info("[recordDetailVote]", {
     dilemmaId,
-    voterMode: user ? "authenticated" : "anonymous",
-    hasComment: Boolean(commentBody),
+    voterMode: identity.kind,
+    payload: optionId ? { optionId } : { choice: rawChoice },
   });
 
   const voter =
-    user ?
-      { voter_id: user.id, anonymous_session_id: null }
-    : { voter_id: null, anonymous_session_id: await getOrCreateAnonymousSessionId() };
-  const voteId = crypto.randomUUID();
-  const votePayload =
+    identity.kind === "authenticated" ?
+      { voter_id: identity.userId, anonymous_session_id: null }
+    : { voter_id: null, anonymous_session_id: identity.sessionId };
+
+  const choicePayload =
     optionId ?
-      {
-        id: voteId,
-        dilemma_id: dilemmaId,
-        option_id: optionId,
-        choice: null,
-        ...voter,
-      }
-    : {
-        id: voteId,
-        dilemma_id: dilemmaId,
-        option_id: null,
-        choice: voteChoiceSchema.parse(rawChoice),
-        ...voter,
-      };
+      { option_id: optionId, choice: null }
+    : { option_id: null, choice: voteChoiceSchema.parse(rawChoice) };
 
-  const { error: voteError } = await supabase.from("votes").insert(votePayload);
+  const existingVoteId = await findExistingVoteId(supabase, dilemmaId, identity);
 
-  if (voteError?.code === "23505") {
-    return duplicateVoteState();
-  }
+  if (existingVoteId) {
+    const { error: updateError } = await supabase
+      .from("votes")
+      .update(choicePayload)
+      .eq("id", existingVoteId);
 
-  if (voteError) {
-    return {
-      status: "error",
-      message: "투표를 저장하지 못했어요. 잠시 후 다시 시도해주세요.",
-    };
-  }
-
-  if (commentBody) {
-    const { error: commentError } = await supabase.from("comments").insert({
-      author_id: user?.id ?? null,
-      body: commentBody,
-      dilemma_id: dilemmaId,
-      vote_id: voteId,
-    });
-
-    if (commentError) {
+    if (updateError) {
+      console.error("[recordDetailVote] update failed", { code: updateError.code });
       return {
         status: "error",
-        message: "한마디를 저장하지 못했어요. 투표는 반영됐습니다.",
+        message: "투표를 변경하지 못했어요. 잠시 후 다시 시도해주세요.",
+      };
+    }
+  } else {
+    const { error: insertError } = await supabase.from("votes").insert({
+      dilemma_id: dilemmaId,
+      ...choicePayload,
+      ...voter,
+    });
+
+    if (insertError) {
+      console.error("[recordDetailVote] insert failed", { code: insertError.code });
+      return {
+        status: "error",
+        message: "투표를 저장하지 못했어요. 잠시 후 다시 시도해주세요.",
       };
     }
   }
@@ -155,5 +174,72 @@ export async function castDetailVote(
   return {
     status: "success",
     message: "투표가 반영됐어요.",
+  };
+}
+
+export async function submitDetailComment(
+  _state: DetailCommentActionState,
+  formData: FormData,
+): Promise<DetailCommentActionState> {
+  const dilemmaId = readRequiredFormValue(formData, "dilemmaId");
+  const rawComment = readOptionalFormValue(formData, "comment");
+
+  if (!rawComment || rawComment.trim().length === 0) {
+    return {
+      status: "error",
+      message: "댓글 내용을 입력해주세요.",
+    };
+  }
+
+  const commentBody = voteCommentSchema.parse({ body: rawComment.trim() }).body;
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const identity: VoterIdentity =
+    user ?
+      { kind: "authenticated", userId: user.id }
+    : await (async () => {
+        const sessionId = await getAnonymousSessionIdIfPresent();
+        if (!sessionId) {
+          return { kind: "anonymous", sessionId: await getOrCreateAnonymousSessionId() };
+        }
+        return { kind: "anonymous" as const, sessionId };
+      })();
+
+  console.info("[submitDetailComment]", {
+    dilemmaId,
+    voterMode: identity.kind,
+  });
+
+  const voteId = await findExistingVoteId(supabase, dilemmaId, identity);
+
+  if (!voteId) {
+    return {
+      status: "error",
+      message: "먼저 투표한 뒤 댓글을 남겨주세요.",
+    };
+  }
+
+  const { error: commentError } = await supabase.from("comments").insert({
+    author_id: identity.kind === "authenticated" ? identity.userId : null,
+    body: commentBody,
+    dilemma_id: dilemmaId,
+    vote_id: voteId,
+  });
+
+  if (commentError) {
+    console.error("[submitDetailComment] insert failed", { code: commentError.code });
+    return {
+      status: "error",
+      message: "댓글을 저장하지 못했어요. 잠시 후 다시 시도해주세요.",
+    };
+  }
+
+  revalidatePath(`/votes/${dilemmaId}`);
+
+  return {
+    status: "success",
+    message: "댓글이 등록됐어요.",
   };
 }

@@ -60,8 +60,18 @@ const abDetail: VoteDetailItem = {
 };
 
 describe("VoteDetail", () => {
+  function renderDetail(detail: VoteDetailItem) {
+    return render(
+      <VoteDetail
+        detail={detail}
+        recordVoteAction={vi.fn(async () => ({ status: "idle" }))}
+        submitCommentAction={vi.fn(async () => ({ status: "idle" }))}
+      />,
+    );
+  }
+
   it("renders a buy/skip detail with product information and two choices", () => {
-    render(<VoteDetail detail={buySkipDetail} voteAction={vi.fn()} />);
+    renderDetail(buySkipDetail);
 
     expect(screen.getByText("캐시미어브라운 코트")).toBeInTheDocument();
     expect(screen.getByText("307,000원")).toBeInTheDocument();
@@ -72,7 +82,7 @@ describe("VoteDetail", () => {
   });
 
   it("renders an A/B detail with both option choices", () => {
-    render(<VoteDetail detail={abDetail} voteAction={vi.fn()} />);
+    renderDetail(abDetail);
 
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("B")).toBeInTheDocument();
@@ -82,7 +92,7 @@ describe("VoteDetail", () => {
   });
 
   it("renders vote-linked comments and the 200 character comment input", () => {
-    render(<VoteDetail detail={buySkipDetail} voteAction={vi.fn()} />);
+    renderDetail(buySkipDetail);
 
     expect(screen.getByText("댓글")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();

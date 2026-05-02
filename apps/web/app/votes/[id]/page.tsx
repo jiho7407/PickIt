@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { castDetailVote } from "@/features/votes/vote-actions";
+import { recordDetailVote, submitDetailComment } from "@/features/votes/vote-actions";
 import { VoteDetail } from "@/features/votes/vote-detail";
 import { getVoteDetail } from "@/features/votes/vote-detail.server";
 
@@ -17,5 +17,11 @@ export default async function VoteDetailPage({ params }: VoteDetailPageProps) {
     notFound();
   }
 
-  return <VoteDetail detail={detail} voteAction={castDetailVote} />;
+  return (
+    <VoteDetail
+      detail={detail}
+      recordVoteAction={recordDetailVote}
+      submitCommentAction={submitDetailComment}
+    />
+  );
 }
