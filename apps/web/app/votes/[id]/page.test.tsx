@@ -20,6 +20,14 @@ vi.mock("@/features/votes/vote-detail.server", () => ({
   getVoteDetail: vi.fn(),
 }));
 
+vi.mock("@/lib/supabase/server", () => ({
+  createServerSupabaseClient: vi.fn(async () => ({
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: null } })),
+    },
+  })),
+}));
+
 describe("VoteDetailPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();

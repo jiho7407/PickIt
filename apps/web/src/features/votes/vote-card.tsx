@@ -37,6 +37,7 @@ export type VoteFeedItem = {
 type VoteCardProps = {
   item: VoteFeedItem;
   quickVoteAction: (formData: FormData) => void | Promise<void>;
+  redirectTo?: string;
 };
 
 function formatKrw(price: number) {
@@ -92,16 +93,19 @@ function QuickVoteButton({
   choice,
   optionId,
   quickVoteAction,
+  redirectTo,
 }: {
   children: React.ReactNode;
   dilemmaId: string;
   choice?: "buy" | "skip";
   optionId?: string;
   quickVoteAction: VoteCardProps["quickVoteAction"];
+  redirectTo: string;
 }) {
   return (
     <form action={quickVoteAction} className="w-full">
       <input type="hidden" name="dilemmaId" value={dilemmaId} />
+      <input type="hidden" name="redirectTo" value={redirectTo} />
       {choice ?
         <input type="hidden" name="choice" value={choice} />
       : null}
@@ -129,7 +133,7 @@ function OwnVoteNotice({ item }: { item: VoteFeedItem }) {
   );
 }
 
-function VoteActions({ item, quickVoteAction }: VoteCardProps) {
+function VoteActions({ item, quickVoteAction, redirectTo = "/" }: VoteCardProps) {
   if (item.isOwn) {
     return <OwnVoteNotice item={item} />;
   }
@@ -145,6 +149,7 @@ function VoteActions({ item, quickVoteAction }: VoteCardProps) {
             dilemmaId={item.id}
             optionId={option.id}
             quickVoteAction={quickVoteAction}
+            redirectTo={redirectTo}
           >
             {option.position === 1 ? "A" : "B"}가 나아
           </QuickVoteButton>
@@ -155,10 +160,20 @@ function VoteActions({ item, quickVoteAction }: VoteCardProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <QuickVoteButton dilemmaId={item.id} choice="buy" quickVoteAction={quickVoteAction}>
+      <QuickVoteButton
+        dilemmaId={item.id}
+        choice="buy"
+        quickVoteAction={quickVoteAction}
+        redirectTo={redirectTo}
+      >
         사도 괜찮아
       </QuickVoteButton>
-      <QuickVoteButton dilemmaId={item.id} choice="skip" quickVoteAction={quickVoteAction}>
+      <QuickVoteButton
+        dilemmaId={item.id}
+        choice="skip"
+        quickVoteAction={quickVoteAction}
+        redirectTo={redirectTo}
+      >
         참는 게 나아
       </QuickVoteButton>
     </div>
@@ -234,7 +249,7 @@ function CommentPreview({ item }: { item: VoteFeedItem }) {
   );
 }
 
-export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
+export function VoteCard({ item, quickVoteAction, redirectTo = "/" }: VoteCardProps) {
   const options = [...(item.options ?? [])].sort((a, b) => a.position - b.position);
   const detailLabel = `${item.productName} 상세 보기`;
 
@@ -285,7 +300,7 @@ export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
       </Link>
 
       <div className="space-y-4 px-5 pb-4 pt-4">
-        <VoteActions item={item} quickVoteAction={quickVoteAction} />
+        <VoteActions item={item} quickVoteAction={quickVoteAction} redirectTo={redirectTo} />
         <CardStatus item={item} />
       </div>
 

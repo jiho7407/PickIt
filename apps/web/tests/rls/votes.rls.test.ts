@@ -76,17 +76,33 @@ describe("votes and anonymous session RLS", () => {
     expect(anonymousVote.error).not.toBeNull();
   });
 
-  it("prevents vote updates and deletes in the MVP", async () => {
+  it("lets voters update their own vote but prevents other updates and deletes", async () => {
     const dilemmaId = await insertDilemma(ctx);
     const voteId = await insertAuthenticatedVote(ctx, ctx.users.authorB, dilemmaId, "buy");
 
-    await ctx.users.authorB.client.from("votes").update({ choice: "skip" }).eq("id", voteId);
+    const ownUpdate = await ctx.users.authorB.client
+      .from("votes")
+      .update({ choice: "skip" })
+      .eq("id", voteId);
+    expect(ownUpdate.error).toBeNull();
+
     const { data: afterUpdate } = await ctx.service
       .from("votes")
       .select("choice")
       .eq("id", voteId)
       .single();
-    expect(afterUpdate?.choice).toBe("buy");
+    expect(afterUpdate?.choice).toBe("skip");
+
+    await ctx.users.operator.client
+      .from("votes")
+      .update({ choice: "buy" })
+      .eq("id", voteId);
+    const { data: afterOtherUpdate } = await ctx.service
+      .from("votes")
+      .select("choice")
+      .eq("id", voteId)
+      .single();
+    expect(afterOtherUpdate?.choice).toBe("skip");
 
     await ctx.users.authorB.client.from("votes").delete().eq("id", voteId);
     const { data: afterDelete } = await ctx.service

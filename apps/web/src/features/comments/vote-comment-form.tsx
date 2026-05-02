@@ -10,9 +10,16 @@ type VoteCommentFormProps = {
     formData: FormData,
   ) => DetailCommentActionState | Promise<DetailCommentActionState>;
   dilemmaId: string;
+  isAuthenticated?: boolean;
+  loginHref?: string;
 };
 
-export function VoteCommentForm({ action, dilemmaId }: VoteCommentFormProps) {
+export function VoteCommentForm({
+  action,
+  dilemmaId,
+  isAuthenticated = false,
+  loginHref = "/login",
+}: VoteCommentFormProps) {
   const [state, formAction, pending] = useActionState(action, { status: "idle" });
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -26,6 +33,14 @@ export function VoteCommentForm({ action, dilemmaId }: VoteCommentFormProps) {
     <form
       ref={formRef}
       action={formAction}
+      onSubmit={(event) => {
+        if (isAuthenticated) {
+          return;
+        }
+
+        event.preventDefault();
+        window.location.assign(loginHref);
+      }}
       className="sticky bottom-0 z-20 border-t border-[#f1f5f9] bg-white px-5 py-3"
     >
       <input type="hidden" name="dilemmaId" value={dilemmaId} />

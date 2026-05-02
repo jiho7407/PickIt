@@ -34,6 +34,8 @@ type VoteDetailProps = {
     state: DetailCommentActionState,
     formData: FormData,
   ) => DetailCommentActionState | Promise<DetailCommentActionState>;
+  isAuthenticated?: boolean;
+  loginHref?: string;
 };
 
 type BuySkipSelection = Extract<VoteSelection, { kind: "choice" }>;
@@ -220,7 +222,13 @@ function leadingSelection(detail: VoteDetailItem): VoteSelection | null {
   };
 }
 
-export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: VoteDetailProps) {
+export function VoteDetail({
+  detail,
+  recordVoteAction,
+  submitCommentAction,
+  isAuthenticated = false,
+  loginHref = "/login",
+}: VoteDetailProps) {
   const myVoteSelection = useMemo(() => selectionFromMyVote(detail), [detail]);
   const fallbackSelection = useMemo(() => leadingSelection(detail), [detail]);
   const [voted, setVoted] = useState(detail.hasVoted);
@@ -240,6 +248,11 @@ export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: Vo
     displayedSelection?.kind === "option" ? displayedSelection : { kind: "option", optionId: "" };
 
   function handleSelect(next: VoteSelection) {
+    if (!isAuthenticated) {
+      window.location.assign(loginHref);
+      return;
+    }
+
     const previousSelection = mySelection;
     const previousVoted = voted;
     setMySelection(next);
@@ -318,7 +331,12 @@ export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: Vo
 
       <div className="h-2 bg-[#f8faff]" />
       <CommentsSection comments={detail.comments} />
-      <VoteCommentForm action={submitCommentAction} dilemmaId={detail.id} />
+      <VoteCommentForm
+        action={submitCommentAction}
+        dilemmaId={detail.id}
+        isAuthenticated={isAuthenticated}
+        loginHref={loginHref}
+      />
     </main>
   );
 }

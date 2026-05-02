@@ -88,6 +88,40 @@ that plainly in the handoff.
 - RLS, constraints, and server actions should agree. Do not rely only on UI
   guards for permissions.
 
+## Auth And OAuth Rules
+
+OAuth/PKCE issues must be treated as configuration and session-boundary
+problems first. Do not paper over them with route-level or component-level
+workarounds.
+
+- Keep the app origin, Supabase Auth Site URL/Redirect URLs, and Google OAuth
+  authorized redirect URI exactly aligned. `localhost` and `127.0.0.1` are
+  different browser cookie hosts. Pick one per environment and use only that
+  origin for testing.
+- Do not add middleware that rewrites or redirects between `localhost` and
+  `127.0.0.1`. Host canonicalization in middleware breaks PKCE verifier cookies
+  and can create redirect loops.
+- Do not recover or reinterpret OAuth `code` query params from arbitrary routes
+  such as `/?code=...`. If OAuth code lands anywhere other than
+  `/auth/callback`, fix Supabase/Google redirect configuration instead of
+  adding app runtime patches.
+- Middleware should stay limited to session refresh and intentional protected
+  route checks. Do not use it for ad hoc auth state repair.
+- Keep auth state authoritative on the server for protected writes. Server
+  actions that create votes, comments, dilemmas, profiles, or other user-owned
+  data must call Supabase `auth.getUser()` and reject unauthenticated requests.
+- Do not add per-button or per-form browser Supabase session re-checks to work
+  around stale React state. If UI state seems stale after login/logout, inspect
+  server rendering, cache boundaries, and auth configuration before changing
+  individual components.
+- The auth callback route may explicitly attach Supabase `Set-Cookie` headers
+  to its redirect response when exchanging the code for a session. That is a
+  session propagation fix, not a substitute for correct redirect URL
+  configuration.
+- When debugging auth, first clear browser site data for both `localhost` and
+  `127.0.0.1`, then reproduce from a single chosen origin. Document the exact
+  origin and callback URL in the handoff.
+
 ## Product/UI Rules
 
 - Product tasks should use the existing project patterns established by the

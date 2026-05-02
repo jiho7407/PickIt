@@ -1,4 +1,5 @@
 import { PendingLifeStageCommitter } from "@/features/onboarding/onboarding-screen";
+import { redirectIfLifeStageMissing } from "@/features/profile/profile-onboarding";
 import { castQuickVote } from "@/features/votes/vote-actions";
 import { VoteFeed } from "@/features/votes/vote-feed";
 import { getPublicVoteFeedItems, parseVoteFeedFilter } from "@/features/votes/vote-feed.server";
@@ -22,6 +23,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user) {
+    const currentPath = filter.stage ? `/?stage=${filter.stage}` : "/";
+    await redirectIfLifeStageMissing(supabase, user.id, currentPath);
+  }
 
   return (
     <>

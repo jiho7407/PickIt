@@ -1,10 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  getAnonymousSessionIdIfPresent,
-  getOrCreateAnonymousSessionId,
-} from "@/lib/session/anonymous-session";
+import { redirect } from "next/navigation";
+import { getLoginHref, getSafeRedirectPath } from "@/lib/redirect";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { voteChoiceSchema, voteCommentSchema } from "./schema";
 
@@ -37,20 +35,15 @@ export async function castQuickVote(formData: FormData) {
   const dilemmaId = readRequiredFormValue(formData, "dilemmaId");
   const optionId = formData.get("optionId");
   const rawChoice = formData.get("choice");
+  const redirectTo = getSafeRedirectPath(readOptionalFormValue(formData, "redirectTo"));
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.info("[castQuickVote]", {
-    dilemmaId,
-    voterMode: user ? "authenticated" : "anonymous",
-  });
-
-  const voter =
-    user ?
-      { voter_id: user.id, anonymous_session_id: null }
-    : { voter_id: null, anonymous_session_id: await getOrCreateAnonymousSessionId() };
+  if (!user) {
+    redirect(getLoginHref(redirectTo));
+  }
 
   const votePayload =
     typeof optionId === "string" && optionId.length > 0 ?
@@ -58,44 +51,27 @@ export async function castQuickVote(formData: FormData) {
         dilemma_id: dilemmaId,
         option_id: optionId,
         choice: null,
-        ...voter,
+        voter_id: user.id,
+        anonymous_session_id: null,
       }
     : {
         dilemma_id: dilemmaId,
         option_id: null,
         choice: voteChoiceSchema.parse(rawChoice),
-        ...voter,
+        voter_id: user.id,
+        anonymous_session_id: null,
       };
 
   const { error } = await supabase.from("votes").insert(votePayload);
 
   // 23505: duplicate vote (already voted from the home card).
   // 23514: validate_vote check_violation (e.g., authors voting on their own dilemma).
-  // We swallow both so the home card never throws into the error boundary; the
-  // detail screen surfaces the same conditions with a proper message.
+  // We swallow both so the home card never throws into the error boundary.
   if (error && error.code !== "23505" && error.code !== "23514") {
     throw error;
   }
 
   revalidatePath("/");
-}
-
-type VoterIdentity =
-  | { kind: "authenticated"; userId: string }
-  | { kind: "anonymous"; sessionId: string };
-
-async function resolveVoterIdentity(): Promise<VoterIdentity> {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    return { kind: "authenticated", userId: user.id };
-  }
-
-  const sessionId = await getOrCreateAnonymousSessionId();
-  return { kind: "anonymous", sessionId };
 }
 
 type SupabaseWriteError = {
@@ -140,17 +116,14 @@ function mapVoteWriteError(
 async function findExistingVoteId(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
   dilemmaId: string,
-  identity: VoterIdentity,
+  userId: string,
 ): Promise<string | null> {
-  let query = supabase.from("votes").select("id").eq("dilemma_id", dilemmaId);
-
-  if (identity.kind === "authenticated") {
-    query = query.eq("voter_id", identity.userId);
-  } else {
-    query = query.eq("anonymous_session_id", identity.sessionId);
-  }
-
-  const { data } = await query.maybeSingle();
+  const { data } = await supabase
+    .from("votes")
+    .select("id")
+    .eq("dilemma_id", dilemmaId)
+    .eq("voter_id", userId)
+    .maybeSingle();
   return data?.id ?? null;
 }
 
@@ -162,25 +135,28 @@ export async function recordDetailVote(
   const optionId = readOptionalFormValue(formData, "optionId");
   const rawChoice = readOptionalFormValue(formData, "choice");
   const supabase = await createServerSupabaseClient();
-  const identity = await resolveVoterIdentity();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      status: "error",
+      message: "로그인한 뒤 투표할 수 있어요.",
+    };
+  }
 
   console.info("[recordDetailVote]", {
     dilemmaId,
-    voterMode: identity.kind,
     payload: optionId ? { optionId } : { choice: rawChoice },
   });
-
-  const voter =
-    identity.kind === "authenticated" ?
-      { voter_id: identity.userId, anonymous_session_id: null }
-    : { voter_id: null, anonymous_session_id: identity.sessionId };
 
   const choicePayload =
     optionId ?
       { option_id: optionId, choice: null }
     : { option_id: null, choice: voteChoiceSchema.parse(rawChoice) };
 
-  const existingVoteId = await findExistingVoteId(supabase, dilemmaId, identity);
+  const existingVoteId = await findExistingVoteId(supabase, dilemmaId, user.id);
 
   if (existingVoteId) {
     const { error: updateError } = await supabase
@@ -200,7 +176,8 @@ export async function recordDetailVote(
     const { error: insertError } = await supabase.from("votes").insert({
       dilemma_id: dilemmaId,
       ...choicePayload,
-      ...voter,
+      voter_id: user.id,
+      anonymous_session_id: null,
     });
 
     if (insertError) {
@@ -241,23 +218,17 @@ export async function submitDetailComment(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const identity: VoterIdentity =
-    user ?
-      { kind: "authenticated", userId: user.id }
-    : await (async () => {
-        const sessionId = await getAnonymousSessionIdIfPresent();
-        if (!sessionId) {
-          return { kind: "anonymous", sessionId: await getOrCreateAnonymousSessionId() };
-        }
-        return { kind: "anonymous" as const, sessionId };
-      })();
 
-  console.info("[submitDetailComment]", {
-    dilemmaId,
-    voterMode: identity.kind,
-  });
+  if (!user) {
+    return {
+      status: "error",
+      message: "로그인한 뒤 댓글을 남길 수 있어요.",
+    };
+  }
 
-  const voteId = await findExistingVoteId(supabase, dilemmaId, identity);
+  console.info("[submitDetailComment]", { dilemmaId });
+
+  const voteId = await findExistingVoteId(supabase, dilemmaId, user.id);
 
   if (!voteId) {
     return {
@@ -267,7 +238,7 @@ export async function submitDetailComment(
   }
 
   const { error: commentError } = await supabase.from("comments").insert({
-    author_id: identity.kind === "authenticated" ? identity.userId : null,
+    author_id: user.id,
     body: commentBody,
     dilemma_id: dilemmaId,
     vote_id: voteId,

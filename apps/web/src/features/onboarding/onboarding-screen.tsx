@@ -18,11 +18,17 @@ type OAuthProvider = "google" | "kakao";
 type OnboardingScreenProps = {
   activeSlide?: 0 | 1;
   onLoginClick?: (provider: OAuthProvider) => void;
+  redirectTo?: string;
 };
 
 type LifeStageSelectionScreenProps = {
   initialLifeStage?: LifeStageValue | null;
   provider?: OAuthProvider;
+  redirectTo?: string;
+};
+
+type AuthenticatedLifeStageSelectionScreenProps = {
+  initialLifeStage?: LifeStageValue | null;
   redirectTo?: string;
 };
 
@@ -106,7 +112,11 @@ function SlideDots({
   );
 }
 
-export function OnboardingScreen({ activeSlide, onLoginClick }: OnboardingScreenProps) {
+export function OnboardingScreen({
+  activeSlide,
+  onLoginClick,
+  redirectTo = "/",
+}: OnboardingScreenProps) {
   const [currentSlide, setCurrentSlide] = useState<0 | 1>(activeSlide ?? 0);
   const slideTrackRef = useRef<HTMLDivElement | null>(null);
 
@@ -195,7 +205,7 @@ export function OnboardingScreen({ activeSlide, onLoginClick }: OnboardingScreen
 
         <div className="mt-5">
           <SocialLoginButtons
-            redirectTo="/"
+            redirectTo={redirectTo}
             onLoginClick={onLoginClick}
             showKakao={process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED === "true"}
           />
@@ -460,6 +470,85 @@ export function LifeStageSelectionScreen({
             className="h-14 w-full rounded-xl bg-[#32cfc6] px-6 text-lg font-semibold leading-[1.3] text-[#f9f9f9] disabled:bg-[#e5edf5] disabled:text-[#94a3b8]"
           >
             {isSubmitting ? "로그인 중…" : "선택 완료"}
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export function AuthenticatedLifeStageSelectionScreen({
+  initialLifeStage = null,
+  redirectTo = "/",
+}: AuthenticatedLifeStageSelectionScreenProps) {
+  const [selectedLifeStage, setSelectedLifeStage] = useState<LifeStageValue | null>(
+    initialLifeStage,
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleConfirm() {
+    if (!selectedLifeStage || isSubmitting) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    const result = await updateMyLifeStage(selectedLifeStage);
+
+    if (result.ok) {
+      window.location.assign(redirectTo);
+      return;
+    }
+
+    setErrorMessage("태그를 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
+    setIsSubmitting(false);
+  }
+
+  return (
+    <main className="mx-auto min-h-dvh w-full max-w-[360px] overflow-hidden bg-white text-[#0f172a]">
+      <section className="flex min-h-dvh flex-col px-5 pb-8 pt-[102px]">
+        <div className="space-y-2 leading-[1.3]">
+          <h1 className="text-xl font-bold text-[#0f172a]">나에게 맞는 태그를 선택해주세요</h1>
+          <p className="text-base text-[#64748b]">1개만 선택할 수 있어요</p>
+        </div>
+
+        <div className="mt-9 grid grid-cols-2 gap-3">
+          {LIFE_STAGE_OPTIONS.map((option) => {
+            const selected = selectedLifeStage === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setSelectedLifeStage(option.value)}
+                className={`flex h-[133px] flex-col items-center justify-center gap-2 rounded-xl border bg-white text-base font-semibold leading-[1.3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6] ${
+                  selected ? "border-[#32cfc6] text-[#1fa89f]" : "border-[#dfe5ed] text-[#0f172a]"
+                }`}
+              >
+                <StageIcon icon={option.icon} />
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {errorMessage ?
+          <p className="mt-4 text-sm font-medium text-red-600" role="alert">
+            {errorMessage}
+          </p>
+        : null}
+
+        <div className="mt-auto">
+          <button
+            type="button"
+            disabled={!selectedLifeStage || isSubmitting}
+            onClick={() => void handleConfirm()}
+            className="h-14 w-full rounded-xl bg-[#32cfc6] px-6 text-lg font-semibold leading-[1.3] text-[#f9f9f9] disabled:bg-[#e5edf5] disabled:text-[#94a3b8]"
+          >
+            {isSubmitting ? "저장 중…" : "선택 완료"}
           </button>
         </div>
       </section>

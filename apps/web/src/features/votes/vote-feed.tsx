@@ -156,7 +156,12 @@ export function VoteFeed({
       {items.length > 0 ?
         <section aria-label="공개 투표 목록">
           {items.map((item) => (
-            <VoteCard key={item.id} item={item} quickVoteAction={quickVoteAction} />
+            <VoteCard
+              key={item.id}
+              item={item}
+              quickVoteAction={quickVoteAction}
+              redirectTo={buildFilterHref(activeStage ?? null)}
+            />
           ))}
         </section>
       : <EmptyFeed />}
