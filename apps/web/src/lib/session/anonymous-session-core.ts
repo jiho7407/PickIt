@@ -3,7 +3,7 @@ import type { CookieOptions } from "@supabase/ssr";
 export const ANONYMOUS_SESSION_COOKIE = "pickit_anon_sid";
 export const ANONYMOUS_SESSION_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true,
+  secure: process.env.NODE_ENV === "production",
   sameSite: "lax",
   maxAge: 60 * 60 * 24 * 180,
   path: "/",
