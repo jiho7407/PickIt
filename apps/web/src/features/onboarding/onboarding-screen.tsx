@@ -467,7 +467,7 @@ export function LifeStageSelectionScreen({
   );
 }
 
-function PendingLifeStageCommitter() {
+export function PendingLifeStageCommitter() {
   useEffect(() => {
     void consumePendingLifeStage(updateMyLifeStage, window.sessionStorage);
   }, []);

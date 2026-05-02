@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { signOutAction } from "@/features/auth/auth-actions";
 import { LIFE_STAGE_OPTIONS, type LifeStageValue } from "@/features/onboarding/onboarding-trigger";
 import { BellIcon, HomeIcon, PickItLogo, PlusIcon, ProfileIcon } from "./icons";
 import { ScrollToTopButton } from "./scroll-to-top";
@@ -97,7 +98,14 @@ export function VoteFeed({
           <PickItLogo className="h-6 w-[85px]" />
           <div className="flex items-center gap-2">
             {isAuthenticated ?
-              null
+              <form action={signOutAction}>
+                <button
+                  type="submit"
+                  className="rounded-full px-3 py-1 text-sm font-semibold text-[#94a3b8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+                >
+                  로그아웃
+                </button>
+              </form>
             : <Link
                 href="/login"
                 className="rounded-full px-3 py-1 text-sm font-semibold text-[#32cfc6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"

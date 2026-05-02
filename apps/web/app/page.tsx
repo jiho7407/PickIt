@@ -1,3 +1,4 @@
+import { PendingLifeStageCommitter } from "@/features/onboarding/onboarding-screen";
 import { castQuickVote } from "@/features/votes/vote-actions";
 import { VoteFeed } from "@/features/votes/vote-feed";
 import { getPublicVoteFeedItems, parseVoteFeedFilter } from "@/features/votes/vote-feed.server";
@@ -23,11 +24,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   } = await supabase.auth.getUser();
 
   return (
-    <VoteFeed
-      items={items}
-      quickVoteAction={castQuickVote}
-      activeStage={filter.stage}
-      isAuthenticated={Boolean(user)}
-    />
+    <>
+      {user ? <PendingLifeStageCommitter /> : null}
+      <VoteFeed
+        items={items}
+        quickVoteAction={castQuickVote}
+        activeStage={filter.stage}
+        isAuthenticated={Boolean(user)}
+      />
+    </>
   );
 }
