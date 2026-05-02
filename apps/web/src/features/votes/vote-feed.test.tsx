@@ -75,21 +75,21 @@ describe("VoteFeed", () => {
     expect(screen.queryByText("전자기기")).not.toBeInTheDocument();
   });
 
-  it("renders the comment preview author from profile data", () => {
-    render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
-
-    expect(screen.getByText("분당대학생")).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /면접앞둔취준생 투표 댓글 더보기/ }),
-    ).toHaveAttribute("href", "/votes/dilemma-1");
-  });
-
   it("displays vote count alongside category and comment count", () => {
     render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
 
     expect(screen.getByText("투표 5")).toBeInTheDocument();
     expect(screen.getByText("투표 3")).toBeInTheDocument();
     expect(screen.getByText("투표 8")).toBeInTheDocument();
+  });
+
+  it("renders the comment preview row from profile data", () => {
+    render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
+
+    expect(screen.getByText("분당대학생")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /면접앞둔취준생 투표 댓글 더보기/ }),
+    ).toHaveAttribute("href", "/votes/dilemma-1");
   });
 
   it("renders an empty state when there are no public votes", () => {

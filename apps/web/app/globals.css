@@ -24,18 +24,3 @@ body {
     "Segoe UI",
     sans-serif;
 }
-
-.pickit-checker {
-  background-color: #fff;
-  background-image:
-    linear-gradient(45deg, #eef2f7 25%, transparent 25%),
-    linear-gradient(-45deg, #eef2f7 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #eef2f7 75%),
-    linear-gradient(-45deg, transparent 75%, #eef2f7 75%);
-  background-position:
-    0 0,
-    0 10px,
-    10px -10px,
-    -10px 0;
-  background-size: 20px 20px;
-}

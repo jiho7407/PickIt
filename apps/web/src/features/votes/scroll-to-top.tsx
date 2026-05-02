@@ -31,7 +31,7 @@ export function ScrollToTopButton() {
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
-      <ArrowUpIcon className="h-5 w-5" />
+      <ArrowUpIcon className="h-6 w-6" />
     </button>
   );
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
-import { ChevronRightIcon, MessageCircleIcon } from "./icons";
+import { ChevronRightIcon, CommentPreviewIcon, MessageCircleIcon } from "./icons";
 
 export type VoteFeedOption = {
   id: string;
@@ -66,10 +66,12 @@ function formatRelativeTime(createdAt: string, now: number = Date.now()) {
 
 function ProductImage({ imageUrl, label }: { imageUrl: string | null; label?: "A" | "B" }) {
   return (
-    <div className="pickit-checker relative h-40 min-w-0 flex-1 overflow-hidden bg-[#f8faff]">
-      {imageUrl ?
-        <img src={imageUrl} alt="" className="h-full w-full object-cover" />
-      : null}
+    <div className="relative h-40 min-w-0 flex-1 overflow-hidden bg-[#f8faff]">
+      <img
+        src={imageUrl ?? "/votes/feed-checker.png"}
+        alt=""
+        className="h-full w-full object-cover"
+      />
       {label ?
         <span
           className={`absolute left-2 top-2 grid h-7 w-7 place-items-center rounded-lg text-sm font-semibold leading-[1.3] text-white ${
@@ -190,6 +192,32 @@ function CardStatus({ item }: { item: VoteFeedItem }) {
   );
 }
 
+function CommentPreview({ item }: { item: VoteFeedItem }) {
+  if (!item.previewComment) {
+    return null;
+  }
+
+  return (
+    <Link
+      href={`/votes/${item.id}`}
+      aria-label={`${item.author.nickname} 투표 댓글 더보기`}
+      className="flex items-center justify-between gap-2 bg-[#f8faff] px-5 py-3 text-xs leading-[1.3] text-[#334155] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+    >
+      <span className="flex min-w-0 flex-1 items-center gap-2">
+        <CommentPreviewIcon className="h-5 w-5 shrink-0" />
+        <span className="flex h-4 min-w-0 items-center gap-1">
+          <span className="shrink-0 font-semibold">{item.previewComment.authorName}</span>
+          <span className="min-w-0 truncate">: {item.previewComment.body}</span>
+        </span>
+      </span>
+      <span className="flex shrink-0 items-center text-[#94a3b8]">
+        <span>더보기</span>
+        <ChevronRightIcon className="h-5 w-5" />
+      </span>
+    </Link>
+  );
+}
+
 export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
   const options = [...(item.options ?? [])].sort((a, b) => a.position - b.position);
   const detailLabel = `${item.productName} 상세 보기`;
@@ -237,25 +265,7 @@ export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
         <CardStatus item={item} />
       </div>
 
-      {item.previewComment ?
-        <Link
-          href={`/votes/${item.id}`}
-          aria-label={`${item.author.nickname} 투표 댓글 더보기`}
-          className="flex items-center justify-between gap-2 bg-[#f8faff] px-5 py-3 text-xs leading-[1.3] text-[#334155] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
-        >
-          <span className="flex min-w-0 items-center gap-2">
-            <MessageCircleIcon className="h-5 w-5 shrink-0 text-[#64748b]" />
-            <span className="min-w-0 truncate">
-              <span className="font-semibold">{item.previewComment.authorName}</span>
-              <span>: {item.previewComment.body}</span>
-            </span>
-          </span>
-          <span className="flex shrink-0 items-center text-[#94a3b8]">
-            더보기
-            <ChevronRightIcon className="ml-1 h-3 w-3" />
-          </span>
-        </Link>
-      : null}
+      <CommentPreview item={item} />
     </article>
   );
 }
