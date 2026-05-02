@@ -184,14 +184,80 @@ export function OnboardingScreen({ activeSlide, onLoginClick }: OnboardingScreen
 }
 
 function StageIcon({ icon }: { icon: string }) {
-  const common = "relative h-11 w-11";
+  const common = "relative h-11 w-11 overflow-hidden";
 
   if (icon === "book") {
     return (
       <span className={common} aria-hidden="true">
-        <span className="absolute left-[7px] top-[5px] h-5 w-8 rounded border-2 border-[#32cfc6]" />
-        <span className="absolute left-[10px] top-[17px] h-5 w-8 rounded border-2 border-[#ff725e]" />
-        <span className="absolute left-[13px] top-[29px] h-1 w-6 rounded bg-[#32cfc6]" />
+        <img
+          alt=""
+          className="absolute left-[5.37px] top-[7.06px] h-[13.469px] w-[34.593px]"
+          src="/onboarding/stage-book-rect-top.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[31.02px] top-[22.75px] h-[13.469px] w-[3.863px]"
+          src="/onboarding/stage-book-rect-spine.svg"
+        />
+        <span className="absolute left-[4.04px] top-[23.49px] flex h-[13.469px] w-[34.593px] items-center justify-center">
+          <span className="-scale-y-100 flex-none rotate-180">
+            <span className="relative block h-[13.469px] w-[34.593px]">
+              <img
+                alt=""
+                className="absolute inset-0 h-full w-full max-w-none"
+                src="/onboarding/stage-book-rect-bottom.svg"
+              />
+            </span>
+          </span>
+        </span>
+        <img
+          alt=""
+          className="absolute left-[12.98px] top-[10.22px] h-[2.832px] w-[24.59px]"
+          src="/onboarding/stage-book-line-top.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[16.7px] top-[14.55px] h-[2.832px] w-[20.799px]"
+          src="/onboarding/stage-book-line-mid.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[4.11px] top-[5.58px] h-[16.429px] w-[35.89px]"
+          src="/onboarding/stage-book-stroke-top.svg"
+        />
+        <span className="absolute left-[6.43px] top-[26.65px] flex h-[2.832px] w-[24.59px] items-center justify-center">
+          <span className="-scale-y-100 flex-none rotate-180">
+            <span className="relative block h-[2.832px] w-[24.59px]">
+              <img
+                alt=""
+                className="absolute inset-0 h-full w-full max-w-none"
+                src="/onboarding/stage-book-line-bottom.svg"
+              />
+            </span>
+          </span>
+        </span>
+        <span className="absolute left-[6.5px] top-[30.98px] flex h-[2.832px] w-[20.799px] items-center justify-center">
+          <span className="-scale-y-100 flex-none rotate-180">
+            <span className="relative block h-[2.832px] w-[20.799px]">
+              <img
+                alt=""
+                className="absolute inset-0 h-full w-full max-w-none"
+                src="/onboarding/stage-book-line-low.svg"
+              />
+            </span>
+          </span>
+        </span>
+        <span className="absolute left-[4px] top-[22.01px] flex h-[16.429px] w-[35.89px] items-center justify-center">
+          <span className="-scale-y-100 flex-none rotate-180">
+            <span className="relative block h-[16.429px] w-[35.89px]">
+              <img
+                alt=""
+                className="absolute inset-0 h-full w-full max-w-none"
+                src="/onboarding/stage-book-stroke-bottom.svg"
+              />
+            </span>
+          </span>
+        </span>
       </span>
     );
   }
@@ -199,10 +265,49 @@ function StageIcon({ icon }: { icon: string }) {
   if (icon === "cap") {
     return (
       <span className={common} aria-hidden="true">
-        <span className="absolute left-[4px] top-[14px] h-4 w-9 rotate-[-15deg] rounded bg-[#5f586d]" />
-        <span className="absolute left-[12px] top-[23px] h-3 w-6 rounded bg-[#5f586d]" />
-        <span className="absolute left-[32px] top-[24px] h-4 w-px bg-[#ffd33d]" />
-        <span className="absolute left-[30px] top-[36px] h-2 w-2 rounded-full bg-[#ffd33d]" />
+        <img
+          alt=""
+          className="absolute left-[7px] top-[12px] h-[25px] w-[27px]"
+          src="/onboarding/stage-hat-panel.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[1.96px] top-[5.48px] h-[17.944px] w-[37.603px]"
+          src="/onboarding/stage-hat-top.svg"
+        />
+        <span className="absolute left-[1.53px] top-[13.43px] h-[10.584px] w-[38.777px]">
+          <span className="absolute inset-y-0 left-[1.15%] right-0">
+            <img
+              alt=""
+              className="h-full w-full max-w-none"
+              src="/onboarding/stage-hat-brim.svg"
+            />
+          </span>
+        </span>
+        <span className="absolute left-[35.41px] top-[29.62px] h-[8.754px] w-[7.882px]">
+          <span className="absolute inset-y-0 left-[4.24%] right-[4.29%]">
+            <img
+              alt=""
+              className="h-full w-full max-w-none"
+              src="/onboarding/stage-hat-tassel.svg"
+            />
+          </span>
+        </span>
+        <img
+          alt=""
+          className="absolute left-[20.24px] top-[11.12px] h-[18.298px] w-[20.427px]"
+          src="/onboarding/stage-hat-cord.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[37.29px] top-[27.95px] h-[4.094px] w-[3.977px]"
+          src="/onboarding/stage-hat-dot.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[17.33px] top-[10.64px] h-[4.094px] w-[7.18px]"
+          src="/onboarding/stage-hat-dot-wide.svg"
+        />
       </span>
     );
   }
@@ -210,19 +315,47 @@ function StageIcon({ icon }: { icon: string }) {
   if (icon === "briefcase") {
     return (
       <span className={common} aria-hidden="true">
-        <span className="absolute left-[15px] top-[6px] h-3 w-4 rounded-t-lg border-2 border-[#5f586d]" />
-        <span className="absolute left-[5px] top-[15px] h-7 w-9 rounded bg-[#5f586d]" />
-        <span className="absolute left-[19px] top-[25px] h-2 w-2 rounded-sm bg-[#ffb33d]" />
+        <img
+          alt=""
+          className="absolute left-[14.19px] top-[3.64px] h-[11.488px] w-[15.386px]"
+          src="/onboarding/stage-briefcase-handle.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[3.74px] top-[11.06px] h-[29.057px] w-[36.47px]"
+          src="/onboarding/stage-briefcase-body.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[9.63px] top-[21.96px] h-[4.434px] w-[24.694px]"
+          src="/onboarding/stage-briefcase-line.svg"
+        />
+        <img
+          alt=""
+          className="absolute left-[18.55px] top-[21.76px] h-[7.659px] w-[6.458px]"
+          src="/onboarding/stage-briefcase-lock.svg"
+        />
       </span>
     );
   }
 
   return (
     <span className={common} aria-hidden="true">
-      <span className="absolute left-[11px] top-[5px] h-9 w-7 rounded-b-lg rounded-t-xl bg-[#32cfc6]" />
-      <span className="absolute left-[14px] top-[1px] h-4 w-5 rounded-t-full border-4 border-[#32cfc6] border-b-0" />
-      <span className="absolute left-[8px] top-[24px] h-3 w-1 rounded bg-[#32cfc6]" />
-      <span className="absolute right-[8px] top-[24px] h-3 w-1 rounded bg-[#32cfc6]" />
+      <img
+        alt=""
+        className="absolute left-[15.05px] top-[3.91px] h-[11.13px] w-[13.948px]"
+        src="/onboarding/stage-backpack-handle.svg"
+      />
+      <img
+        alt=""
+        className="absolute left-[3.85px] top-[10.24px] h-[29.935px] w-[36.355px]"
+        src="/onboarding/stage-backpack-body.svg"
+      />
+      <img
+        alt=""
+        className="absolute left-[14.01px] top-[25.01px] h-[4.222px] w-[16.389px]"
+        src="/onboarding/stage-backpack-pocket.svg"
+      />
     </span>
   );
 }
