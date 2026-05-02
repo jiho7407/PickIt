@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "./database.types";
 
 export const DILEMMA_IMAGES_BUCKET = "dilemma-images";
@@ -40,7 +40,7 @@ function createBrowserStorageClient(): StorageClient {
     throw new Error("Supabase browser env is not configured");
   }
 
-  return createClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey) as unknown as StorageClient;
 }
 
 function assertAllowedImage(file: File): asserts file is File & { type: AllowedImageType } {

@@ -10,6 +10,7 @@ type VoteFeedProps = {
   items: VoteFeedItem[];
   quickVoteAction: (formData: FormData) => void | Promise<void>;
   activeStage?: LifeStageValue;
+  isAuthenticated?: boolean;
 };
 
 type FilterOption = {
@@ -79,7 +80,12 @@ function BottomNavigation() {
   );
 }
 
-export function VoteFeed({ items, quickVoteAction, activeStage }: VoteFeedProps) {
+export function VoteFeed({
+  items,
+  quickVoteAction,
+  activeStage,
+  isAuthenticated = false,
+}: VoteFeedProps) {
   return (
     <main
       id="top"
@@ -90,12 +96,15 @@ export function VoteFeed({ items, quickVoteAction, activeStage }: VoteFeedProps)
           <h1 className="sr-only">PICKIT</h1>
           <PickItLogo className="h-6 w-[85px]" />
           <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="rounded-full px-3 py-1 text-sm font-semibold text-[#32cfc6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
-            >
-              로그인
-            </Link>
+            {isAuthenticated ?
+              null
+            : <Link
+                href="/login"
+                className="rounded-full px-3 py-1 text-sm font-semibold text-[#32cfc6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+              >
+                로그인
+              </Link>
+            }
             <Link
               href="/notifications"
               aria-label="알림"

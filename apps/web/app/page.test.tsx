@@ -8,6 +8,14 @@ vi.mock("@/features/votes/vote-actions", () => ({
   castQuickVote: vi.fn(),
 }));
 
+vi.mock("@/lib/supabase/server", () => ({
+  createServerSupabaseClient: vi.fn(async () => ({
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: null } })),
+    },
+  })),
+}));
+
 vi.mock("@/features/votes/vote-feed.server", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/features/votes/vote-feed.server")>();
   return {
