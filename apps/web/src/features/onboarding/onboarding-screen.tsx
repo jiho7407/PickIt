@@ -81,13 +81,25 @@ export function SplashScreen() {
   );
 }
 
-function SlideDots({ activeSlide }: { activeSlide: 0 | 1 }) {
+function SlideDots({
+  activeSlide,
+  onSelect,
+}: {
+  activeSlide: 0 | 1;
+  onSelect?: (slide: 0 | 1) => void;
+}) {
   return (
     <div className="flex justify-center gap-2" aria-label={`${activeSlide + 1}/2`}>
-      {[0, 1].map((index) => (
-        <span
+      {([0, 1] as const).map((index) => (
+        <button
           key={index}
-          className={`h-2 w-2 rounded-full ${activeSlide === index ? "bg-[#32cfc6]" : "bg-[#dfe5ed]"}`}
+          type="button"
+          aria-label={`${index + 1}번째 슬라이드로 이동`}
+          aria-current={activeSlide === index}
+          onClick={() => onSelect?.(index)}
+          className={`h-2 w-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6] ${
+            activeSlide === index ? "bg-[#32cfc6]" : "bg-[#dfe5ed]"
+          }`}
         />
       ))}
     </div>
@@ -178,7 +190,7 @@ export function OnboardingScreen({ activeSlide, onLoginClick }: OnboardingScreen
         </div>
 
         <div className="mt-2">
-          <SlideDots activeSlide={currentSlide} />
+          <SlideDots activeSlide={currentSlide} onSelect={(slide) => scrollToSlide(slide)} />
         </div>
 
         <div className="mt-5">
