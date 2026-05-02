@@ -89,13 +89,21 @@ export function VoteFeed({ items, quickVoteAction, activeStage }: VoteFeedProps)
         <div className="flex h-14 items-center justify-between px-5">
           <h1 className="sr-only">PICKIT</h1>
           <PickItLogo className="h-6 w-[85px]" />
-          <Link
-            href="/notifications"
-            aria-label="알림"
-            className="grid h-8 w-8 place-items-center rounded-full text-[#94a3b8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
-          >
-            <BellIcon className="h-5 w-5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="rounded-full px-3 py-1 text-sm font-semibold text-[#32cfc6] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+            >
+              로그인
+            </Link>
+            <Link
+              href="/notifications"
+              aria-label="알림"
+              className="grid h-8 w-8 place-items-center rounded-full text-[#94a3b8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+            >
+              <BellIcon className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
         <div
           aria-label="생활 단계 필터"
