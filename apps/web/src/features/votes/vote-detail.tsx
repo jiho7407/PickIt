@@ -274,10 +274,7 @@ export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: Vo
             <span className="rounded-full bg-[#e8fafa] px-2 py-1 text-xs font-semibold text-[#32cfc6]">
               투표 완료 · 다시 눌러 변경 가능
             </span>
-          : <span className="text-xs leading-[1.3] text-[#94a3b8]">
-              항목을 선택하면 바로 반영돼요
-            </span>
-          }
+          : null}
         </div>
         <div className="px-5 pb-8 pt-4" aria-busy={isPending}>
           {detail.voteType === "ab" ?

@@ -94,6 +94,45 @@ async function resolveVoterIdentity(): Promise<VoterIdentity> {
   return { kind: "anonymous", sessionId };
 }
 
+type SupabaseWriteError = {
+  code?: string | null;
+  message?: string | null;
+  details?: string | null;
+};
+
+function mapVoteWriteError(
+  error: SupabaseWriteError,
+  kind: "insert" | "update",
+): DetailVoteActionState {
+  if (error.code === "23514") {
+    if (error.message?.includes("authors cannot vote on their own dilemmas")) {
+      return {
+        status: "error",
+        message: "본인이 만든 투표에는 투표할 수 없어요.",
+      };
+    }
+    return {
+      status: "error",
+      message: "투표 내용을 처리할 수 없어요. 다시 시도해주세요.",
+    };
+  }
+
+  if (error.code === "42501") {
+    return {
+      status: "error",
+      message: "투표 권한이 없어요. 다시 로그인한 뒤 시도해주세요.",
+    };
+  }
+
+  return {
+    status: "error",
+    message:
+      kind === "update" ?
+        "투표를 변경하지 못했어요. 잠시 후 다시 시도해주세요."
+      : "투표를 저장하지 못했어요. 잠시 후 다시 시도해주세요.",
+  };
+}
+
 async function findExistingVoteId(
   supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
   dilemmaId: string,
@@ -146,11 +185,12 @@ export async function recordDetailVote(
       .eq("id", existingVoteId);
 
     if (updateError) {
-      console.error("[recordDetailVote] update failed", { code: updateError.code });
-      return {
-        status: "error",
-        message: "투표를 변경하지 못했어요. 잠시 후 다시 시도해주세요.",
-      };
+      console.error("[recordDetailVote] update failed", {
+        code: updateError.code,
+        message: updateError.message,
+        details: updateError.details,
+      });
+      return mapVoteWriteError(updateError, "update");
     }
   } else {
     const { error: insertError } = await supabase.from("votes").insert({
@@ -160,11 +200,12 @@ export async function recordDetailVote(
     });
 
     if (insertError) {
-      console.error("[recordDetailVote] insert failed", { code: insertError.code });
-      return {
-        status: "error",
-        message: "투표를 저장하지 못했어요. 잠시 후 다시 시도해주세요.",
-      };
+      console.error("[recordDetailVote] insert failed", {
+        code: insertError.code,
+        message: insertError.message,
+        details: insertError.details,
+      });
+      return mapVoteWriteError(insertError, "insert");
     }
   }
 
