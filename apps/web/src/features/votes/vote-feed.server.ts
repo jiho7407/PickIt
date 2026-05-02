@@ -40,6 +40,7 @@ type RawDilemma = {
   image_path: string | null;
   vote_type: string;
   created_at: string;
+  author_id: string;
   author: RawAuthorRef;
   vote_options: RawVoteOption[] | null;
   comments: RawComment[] | null;
@@ -94,7 +95,7 @@ export async function getPublicVoteFeedItems(
   let query = supabase
     .from("dilemmas")
     .select(
-      "id,title,product_name,price,category,image_path,vote_type,created_at," +
+      "id,title,product_name,price,category,image_path,vote_type,created_at,author_id," +
         "author:profiles!inner(nickname,life_stage)," +
         "vote_options(id,label,price,image_path,position)," +
         "comments(body,created_at,author:profiles(nickname))",
@@ -107,13 +108,18 @@ export async function getPublicVoteFeedItems(
     query = query.eq("author.life_stage", filter.stage);
   }
 
-  const { data, error } = await query;
+  const [
+    {
+      data: { user: currentUser },
+    },
+    queryResult,
+  ] = await Promise.all([supabase.auth.getUser(), query]);
 
-  if (error) {
-    throw error;
+  if (queryResult.error) {
+    throw queryResult.error;
   }
 
-  const rows = (data ?? []) as unknown as RawDilemma[];
+  const rows = (queryResult.data ?? []) as unknown as RawDilemma[];
   const summaries = await getDilemmaVoteSummaries(
     rows.map((row) => row.id),
     supabase,
@@ -142,6 +148,7 @@ export async function getPublicVoteFeedItems(
       voteType: row.vote_type === "ab" ? "ab" : "buy_skip",
       totalVotes: summary?.total_count ?? 0,
       commentCount: sortedComments.length,
+      isOwn: Boolean(currentUser && row.author_id === currentUser.id),
       author: {
         nickname: row.author.nickname,
         lifeStageLabel: lifeStageLabel(row.author.life_stage),

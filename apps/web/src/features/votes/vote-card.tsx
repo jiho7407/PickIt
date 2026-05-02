@@ -22,6 +22,7 @@ export type VoteFeedItem = {
   voteType: "buy_skip" | "ab";
   totalVotes: number;
   commentCount: number;
+  isOwn?: boolean;
   author: {
     nickname: string;
     lifeStageLabel: string | null;
@@ -117,7 +118,22 @@ function QuickVoteButton({
   );
 }
 
+function OwnVoteNotice({ item }: { item: VoteFeedItem }) {
+  return (
+    <Link
+      href={`/votes/${item.id}`}
+      className="flex h-11 w-full items-center justify-center rounded-xl border border-[#dfe5ed] bg-[#f8faff] px-4 text-sm font-semibold leading-[1.3] text-[#64748b] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+    >
+      내가 만든 투표 · 결과 보기
+    </Link>
+  );
+}
+
 function VoteActions({ item, quickVoteAction }: VoteCardProps) {
+  if (item.isOwn) {
+    return <OwnVoteNotice item={item} />;
+  }
+
   if (item.voteType === "ab" && item.options?.length) {
     const options = [...item.options].sort((a, b) => a.position - b.position).slice(0, 2);
 

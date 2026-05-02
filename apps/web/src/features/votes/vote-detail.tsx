@@ -187,6 +187,20 @@ function CommentsSection({ comments }: { comments: VoteDetailComment[] }) {
   );
 }
 
+function selectionFromMyVote(detail: VoteDetailItem): VoteSelection | null {
+  const myVote = detail.myVote;
+  if (!myVote) {
+    return null;
+  }
+  if (detail.voteType === "ab" && myVote.optionId) {
+    return { kind: "option", optionId: myVote.optionId };
+  }
+  if (detail.voteType === "buy_skip" && myVote.choice) {
+    return { kind: "choice", value: myVote.choice };
+  }
+  return null;
+}
+
 function leadingSelection(detail: VoteDetailItem): VoteSelection | null {
   if (detail.voteType === "ab") {
     const [optionA, optionB] = detail.options;
@@ -207,18 +221,17 @@ function leadingSelection(detail: VoteDetailItem): VoteSelection | null {
 }
 
 export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: VoteDetailProps) {
+  const myVoteSelection = useMemo(() => selectionFromMyVote(detail), [detail]);
   const fallbackSelection = useMemo(() => leadingSelection(detail), [detail]);
   const [voted, setVoted] = useState(detail.hasVoted);
-  const [mySelection, setMySelection] = useState<VoteSelection | null>(
-    detail.hasVoted ? fallbackSelection : null,
-  );
+  const [mySelection, setMySelection] = useState<VoteSelection | null>(myVoteSelection);
   const [voteFeedback, setVoteFeedback] = useState<DetailVoteActionState>({ status: "idle" });
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setVoted(detail.hasVoted);
-    setMySelection(detail.hasVoted ? fallbackSelection : null);
-  }, [detail.hasVoted, fallbackSelection]);
+    setMySelection(myVoteSelection);
+  }, [detail.hasVoted, myVoteSelection]);
 
   const displayedSelection = mySelection ?? fallbackSelection;
   const buySkipDisplay: BuySkipSelection =

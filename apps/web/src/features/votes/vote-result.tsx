@@ -107,7 +107,7 @@ export function VoteResultBar({
         style={{ width: `${Math.max(0, Math.min(100, percent))}%` }}
       />
       {showVotedMark ?
-        <span className="absolute left-3 top-1/2 z-10 flex -translate-y-1/2 items-center text-[#32cfc6]">
+        <span className="absolute left-3 top-1/2 z-10 flex -translate-y-1/2 items-center text-[#0f172a]">
           <span className="sr-only">내 투표</span>
           <VotedSwooshIcon className="h-4 w-4" />
         </span>

@@ -14,6 +14,7 @@ const buySkipDetail: VoteDetailItem = {
   createdAt: "2026-04-30T06:20:00.000Z",
   voteType: "buy_skip",
   hasVoted: false,
+  myVote: null,
   author: { nickname: "익명의 아나콘다", lifeStageLabel: "대학생" },
   options: [],
   summary: {

@@ -7,6 +7,7 @@ import type { Database } from "@/lib/database.types";
 import { getAnonymousSessionIdIfPresent } from "@/lib/session/anonymous-session";
 import { getPublicUrl } from "@/lib/storage";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { VoteChoice } from "./schema";
 import { getDilemmaVoteSummary } from "./summary.server";
 
 type VoteDetailClient = SupabaseClient<Database>;
@@ -61,6 +62,11 @@ export type VoteDetailComment = {
   createdAt: string;
 };
 
+export type VoteDetailMyVote = {
+  choice: VoteChoice | null;
+  optionId: string | null;
+};
+
 export type VoteDetailItem = {
   id: string;
   title: string;
@@ -71,6 +77,7 @@ export type VoteDetailItem = {
   createdAt: string;
   voteType: "buy_skip" | "ab";
   hasVoted: boolean;
+  myVote: VoteDetailMyVote | null;
   author: {
     nickname: string;
     lifeStageLabel: string | null;
@@ -123,10 +130,10 @@ function ratio(count: number, total: number) {
   return total === 0 ? 0 : Math.round((count / total) * 100);
 }
 
-async function hasCurrentUserVoted(
+async function getCurrentUserVote(
   supabase: VoteDetailClient,
   dilemmaId: string,
-): Promise<boolean> {
+): Promise<VoteDetailMyVote | null> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -134,20 +141,41 @@ async function hasCurrentUserVoted(
   if (user) {
     const { data, error } = await supabase
       .from("votes")
-      .select("id")
+      .select("choice, option_id")
       .eq("dilemma_id", dilemmaId)
       .eq("voter_id", user.id)
       .maybeSingle();
 
-    if (error) {
-      return false;
+    if (error || !data) {
+      return null;
     }
 
-    return Boolean(data);
+    return {
+      choice: (data.choice as VoteChoice | null) ?? null,
+      optionId: data.option_id ?? null,
+    };
   }
 
   const anonymousSessionId = await getAnonymousSessionIdIfPresent();
-  return Boolean(anonymousSessionId);
+  if (!anonymousSessionId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("votes")
+    .select("choice, option_id")
+    .eq("dilemma_id", dilemmaId)
+    .eq("anonymous_session_id", anonymousSessionId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return {
+    choice: (data.choice as VoteChoice | null) ?? null,
+    optionId: data.option_id ?? null,
+  };
 }
 
 export async function getVoteDetail(
@@ -176,7 +204,10 @@ export async function getVoteDetail(
   }
 
   const row = data as unknown as RawDilemma;
-  const summary = await getDilemmaVoteSummary(dilemmaId, supabase);
+  const [summary, myVote] = await Promise.all([
+    getDilemmaVoteSummary(dilemmaId, supabase),
+    getCurrentUserVote(supabase, row.id),
+  ]);
   const totalCount = summary?.total_count ?? 0;
   const optionACount = summary?.option_a_count ?? 0;
   const optionBCount = summary?.option_b_count ?? 0;
@@ -190,7 +221,8 @@ export async function getVoteDetail(
     imageUrl: toPublicImageUrl(row.image_path, supabase),
     createdAt: row.created_at,
     voteType: row.vote_type === "ab" ? "ab" : "buy_skip",
-    hasVoted: await hasCurrentUserVoted(supabase, row.id),
+    hasVoted: myVote !== null,
+    myVote,
     author: {
       nickname: row.author.nickname,
       lifeStageLabel: lifeStageLabel(row.author.life_stage),
