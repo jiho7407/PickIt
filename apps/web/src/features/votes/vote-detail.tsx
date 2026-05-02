@@ -284,6 +284,7 @@ export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: Vo
               optionBRatio={detail.summary.optionBRatio}
               totalCount={detail.summary.totalCount}
               selected={abDisplay}
+              voted={voted}
               onSelect={handleSelect}
             />
           : <BuySkipVotePanel
@@ -291,6 +292,7 @@ export function VoteDetail({ detail, recordVoteAction, submitCommentAction }: Vo
               skipRatio={detail.summary.skipRatio}
               totalCount={detail.summary.totalCount}
               selected={buySkipDisplay}
+              voted={voted}
               onSelect={handleSelect}
             />}
           {voteFeedback.status === "error" && voteFeedback.message ?

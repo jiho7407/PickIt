@@ -13,6 +13,7 @@ type AbVotePanelProps = {
   options: VoteDetailOption[];
   selected: AbSelection;
   totalCount: number;
+  voted?: boolean;
 };
 
 export function AbVotePanel({
@@ -22,6 +23,7 @@ export function AbVotePanel({
   options,
   selected,
   totalCount,
+  voted = false,
 }: AbVotePanelProps) {
   const [optionA, optionB] = options;
   const aWins = optionARatio >= optionBRatio;
@@ -44,6 +46,7 @@ export function AbVotePanel({
           percent={optionARatio}
           selected={selected.optionId === optionA.id}
           tone={aWins ? "mint" : "gray"}
+          voted={voted}
           onSelect={() => onSelect({ kind: "option", optionId: optionA.id })}
         />
         <VoteResultBar
@@ -51,6 +54,7 @@ export function AbVotePanel({
           percent={optionBRatio}
           selected={selected.optionId === optionB.id}
           tone={aWins ? "gray" : "orange"}
+          voted={voted}
           onSelect={() => onSelect({ kind: "option", optionId: optionB.id })}
         />
       </div>

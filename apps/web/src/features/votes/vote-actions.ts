@@ -69,7 +69,11 @@ export async function castQuickVote(formData: FormData) {
 
   const { error } = await supabase.from("votes").insert(votePayload);
 
-  if (error && error.code !== "23505") {
+  // 23505: duplicate vote (already voted from the home card).
+  // 23514: validate_vote check_violation (e.g., authors voting on their own dilemma).
+  // We swallow both so the home card never throws into the error boundary; the
+  // detail screen surfaces the same conditions with a proper message.
+  if (error && error.code !== "23505" && error.code !== "23514") {
     throw error;
   }
 

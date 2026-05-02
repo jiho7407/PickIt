@@ -242,7 +242,6 @@ export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
 
           <Link
             href={`/votes/${item.id}`}
-            aria-label={detailLabel}
             className="block text-base font-semibold leading-[1.3] text-[#0f172a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
           >
             {item.title}
@@ -250,17 +249,26 @@ export function VoteCard({ item, quickVoteAction }: VoteCardProps) {
         </div>
       </div>
 
-      <div className="flex">
-        {item.voteType === "ab" && options.length >= 2 ?
-          <>
-            <ProductImage imageUrl={options[0].imageUrl} label="A" />
-            <ProductImage imageUrl={options[1].imageUrl} label="B" />
-          </>
-        : <ProductImage imageUrl={item.imageUrl} />}
-      </div>
+      <Link
+        href={`/votes/${item.id}`}
+        aria-label={detailLabel}
+        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6]"
+      >
+        <div className="flex">
+          {item.voteType === "ab" && options.length >= 2 ?
+            <>
+              <ProductImage imageUrl={options[0].imageUrl} label="A" />
+              <ProductImage imageUrl={options[1].imageUrl} label="B" />
+            </>
+          : <ProductImage imageUrl={item.imageUrl} />}
+        </div>
 
-      <div className="space-y-4 px-5 py-4">
-        <ProductDetails item={item} />
+        <div className="pt-4">
+          <ProductDetails item={item} />
+        </div>
+      </Link>
+
+      <div className="space-y-4 px-5 pb-4 pt-4">
         <VoteActions item={item} quickVoteAction={quickVoteAction} />
         <CardStatus item={item} />
       </div>

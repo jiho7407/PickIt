@@ -11,6 +11,7 @@ type BuySkipVotePanelProps = {
   selected: BuySkipSelection;
   skipRatio: number;
   totalCount: number;
+  voted?: boolean;
 };
 
 export function BuySkipVotePanel({
@@ -19,6 +20,7 @@ export function BuySkipVotePanel({
   selected,
   skipRatio,
   totalCount,
+  voted = false,
 }: BuySkipVotePanelProps) {
   const buyWins = buyRatio >= skipRatio;
 
@@ -37,6 +39,7 @@ export function BuySkipVotePanel({
           percent={buyRatio}
           selected={selected.value === "buy"}
           tone={buyWins ? "mint" : "gray"}
+          voted={voted}
           onSelect={() => onSelect({ kind: "choice", value: "buy" })}
         />
         <VoteResultBar
@@ -44,6 +47,7 @@ export function BuySkipVotePanel({
           percent={skipRatio}
           selected={selected.value === "skip"}
           tone={buyWins ? "gray" : "orange"}
+          voted={voted}
           onSelect={() => onSelect({ kind: "choice", value: "skip" })}
         />
       </div>
