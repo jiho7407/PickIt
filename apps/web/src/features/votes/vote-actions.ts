@@ -29,6 +29,11 @@ export async function castQuickVote(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.info("[castQuickVote]", {
+    dilemmaId,
+    voterMode: user ? "authenticated" : "anonymous",
+  });
+
   const voter =
     user ?
       { voter_id: user.id, anonymous_session_id: null }
@@ -86,6 +91,12 @@ export async function castDetailVote(
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  console.info("[castDetailVote]", {
+    dilemmaId,
+    voterMode: user ? "authenticated" : "anonymous",
+    hasComment: Boolean(commentBody),
+  });
 
   const voter =
     user ?

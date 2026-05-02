@@ -5,19 +5,25 @@
 import { type UIEvent, useCallback, useEffect, useRef, useState } from "react";
 import { SocialLoginButtons } from "@/features/auth/social-login-buttons";
 import { updateMyLifeStage } from "@/features/profile/profile-actions";
+import { createClient } from "@/lib/supabase/client";
 import {
   LIFE_STAGE_OPTIONS,
   consumePendingLifeStage,
+  savePendingLifeStage,
   type LifeStageValue,
 } from "./onboarding-trigger";
 
+type OAuthProvider = "google" | "kakao";
+
 type OnboardingScreenProps = {
   activeSlide?: 0 | 1;
-  onLoginClick?: () => void;
+  onLoginClick?: (provider: OAuthProvider) => void;
 };
 
 type LifeStageSelectionScreenProps = {
   initialLifeStage?: LifeStageValue | null;
+  provider?: OAuthProvider;
+  redirectTo?: string;
 };
 
 const onboardingSlides = [
@@ -176,7 +182,11 @@ export function OnboardingScreen({ activeSlide, onLoginClick }: OnboardingScreen
         </div>
 
         <div className="mt-5">
-          <SocialLoginButtons redirectTo="/" onLoginClick={onLoginClick} />
+          <SocialLoginButtons
+            redirectTo="/"
+            onLoginClick={onLoginClick}
+            showKakao={process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED === "true"}
+          />
         </div>
       </section>
     </main>
@@ -362,10 +372,38 @@ function StageIcon({ icon }: { icon: string }) {
 
 export function LifeStageSelectionScreen({
   initialLifeStage = null,
+  provider = "google",
+  redirectTo = "/",
 }: LifeStageSelectionScreenProps) {
   const [selectedLifeStage, setSelectedLifeStage] = useState<LifeStageValue | null>(
     initialLifeStage,
   );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleConfirm() {
+    if (!selectedLifeStage || isSubmitting) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    savePendingLifeStage(selectedLifeStage, window.sessionStorage);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+      },
+    });
+
+    if (error) {
+      setErrorMessage("로그인을 시작하지 못했어요. 잠시 후 다시 시도해주세요.");
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-[360px] overflow-hidden bg-white text-[#0f172a]">
@@ -396,13 +434,20 @@ export function LifeStageSelectionScreen({
           })}
         </div>
 
+        {errorMessage ?
+          <p className="mt-4 text-sm font-medium text-red-600" role="alert">
+            {errorMessage}
+          </p>
+        : null}
+
         <div className="mt-auto">
           <button
             type="button"
-            disabled={!selectedLifeStage}
+            disabled={!selectedLifeStage || isSubmitting}
+            onClick={() => void handleConfirm()}
             className="h-14 w-full rounded-xl bg-[#32cfc6] px-6 text-lg font-semibold leading-[1.3] text-[#f9f9f9] disabled:bg-[#e5edf5] disabled:text-[#94a3b8]"
           >
-            선택 완료
+            {isSubmitting ? "로그인 중…" : "선택 완료"}
           </button>
         </div>
       </section>
@@ -421,6 +466,7 @@ function PendingLifeStageCommitter() {
 export function Product00Flow({ splashDurationMs = 900 }: { splashDurationMs?: number } = {}) {
   const [screen, setScreen] = useState<"splash" | "onboarding" | "life-stage">("splash");
   const [isLeavingSplash, setIsLeavingSplash] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<OAuthProvider>("google");
 
   useEffect(() => {
     if (splashDurationMs === 0) {
@@ -448,7 +494,9 @@ export function Product00Flow({ splashDurationMs = 900 }: { splashDurationMs?: n
   return (
     <>
       <PendingLifeStageCommitter />
-      {screen === "life-stage" ? <LifeStageSelectionScreen /> : null}
+      {screen === "life-stage" ? (
+        <LifeStageSelectionScreen provider={selectedProvider} />
+      ) : null}
       {screen !== "life-stage" ? (
         <div className="relative min-h-dvh overflow-hidden bg-white">
           {showOnboarding ? (
@@ -457,7 +505,12 @@ export function Product00Flow({ splashDurationMs = 900 }: { splashDurationMs?: n
                 isLeavingSplash || screen === "onboarding" ? "opacity-100" : "opacity-0"
               }`}
             >
-              <OnboardingScreen onLoginClick={() => setScreen("life-stage")} />
+              <OnboardingScreen
+                onLoginClick={(provider) => {
+                  setSelectedProvider(provider);
+                  setScreen("life-stage");
+                }}
+              />
             </div>
           ) : null}
           {showSplash ? (

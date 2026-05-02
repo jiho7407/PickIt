@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   LifeStageSelectionScreen,
   OnboardingScreen,
@@ -41,7 +41,26 @@ describe("SplashScreen", () => {
 });
 
 describe("OnboardingScreen", () => {
-  it("renders both Figma login CTAs even when provider setup is not available", () => {
+  const originalKakaoEnabled = process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED;
+
+  afterEach(() => {
+    if (originalKakaoEnabled === undefined) {
+      delete process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED;
+    } else {
+      process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED = originalKakaoEnabled;
+    }
+  });
+
+  it("renders the Google login CTA and hides Kakao when its env flag is unset", () => {
+    delete process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED;
+    render(<OnboardingScreen activeSlide={0} />);
+
+    expect(screen.getByRole("button", { name: "구글 로그인" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "카카오 로그인" })).not.toBeInTheDocument();
+  });
+
+  it("renders the Kakao login CTA when its env flag is enabled", () => {
+    process.env.NEXT_PUBLIC_AUTH_KAKAO_ENABLED = "true";
     render(<OnboardingScreen activeSlide={0} />);
 
     expect(screen.getByRole("button", { name: "구글 로그인" })).toBeInTheDocument();
@@ -66,6 +85,12 @@ describe("OnboardingScreen", () => {
 });
 
 describe("LifeStageSelectionScreen", () => {
+  beforeEach(() => {
+    authMocks.signInWithOAuth.mockReset();
+    authMocks.signInWithOAuth.mockResolvedValue({ error: null });
+    sessionStorage.clear();
+  });
+
   it("lets the user choose exactly one life stage before completing selection", async () => {
     const user = userEvent.setup();
     render(<LifeStageSelectionScreen />);
@@ -99,6 +124,21 @@ describe("LifeStageSelectionScreen", () => {
       "true",
     );
     expect(screen.getByRole("button", { name: "선택 완료" })).toBeEnabled();
+  });
+
+  it("saves the pending life stage and starts OAuth on confirmation", async () => {
+    const user = userEvent.setup();
+    render(<LifeStageSelectionScreen initialLifeStage="university" provider="google" />);
+
+    await user.click(screen.getByRole("button", { name: "선택 완료" }));
+
+    expect(sessionStorage.getItem(PENDING_LIFE_STAGE_KEY)).toBe("university");
+    expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/auth/callback?redirectTo=%2F",
+      },
+    });
   });
 });
 
