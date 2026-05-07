@@ -17,7 +17,8 @@ type CreateVoteFormProps = {
   ) => CreateVoteActionState | Promise<CreateVoteActionState>;
 };
 
-type Step = "type" | "image" | "details" | "situation";
+type Step = "type" | "image" | "detailsA" | "detailsB" | "situation";
+type ImageSlot = "single" | "optionA" | "optionB";
 
 const initialActionState: CreateVoteActionState = { status: "idle" };
 const DEFAULT_PRICE = 50000;
@@ -177,7 +178,7 @@ function ProgressIndicator({ step }: { step: Step }) {
     return null;
   }
 
-  const activeIndex = step === "image" ? 0 : step === "details" ? 1 : 2;
+  const activeIndex = step === "image" ? 0 : step === "detailsA" || step === "detailsB" ? 1 : 2;
 
   return (
     <div className="mx-5 flex h-1.5 gap-3">
@@ -284,60 +285,131 @@ function TypeStep({
   );
 }
 
+function ImageUploadBox({
+  accent,
+  imagePreviewUrl,
+  inputId,
+  isUploading,
+  label,
+  onImageChange,
+  onRemoveImage,
+  uploadLabel,
+}: {
+  accent?: string;
+  imagePreviewUrl: string | null;
+  inputId: string;
+  isUploading: boolean;
+  label: string;
+  onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemoveImage: () => void;
+  uploadLabel: string;
+}) {
+  const firstSpaceIndex = label.indexOf(" ");
+  const emphasis = firstSpaceIndex >= 0 ? label.slice(0, firstSpaceIndex) : label;
+  const suffix = firstSpaceIndex >= 0 ? label.slice(firstSpaceIndex + 1) : "";
+
+  return (
+    <div className="flex w-[153px] flex-col gap-4">
+      <div className="space-y-1">
+        <p className="text-sm font-semibold leading-[1.3] text-[#334155]">
+          {accent ?
+            <>
+              <span style={{ color: accent }}>{emphasis}</span> {suffix}
+            </>
+          : label}
+        </p>
+        <p className="whitespace-nowrap text-xs leading-[1.3] text-[#64748b]">
+          아직 1개의 사진만 첨부 가능해요
+        </p>
+      </div>
+      <input
+        id={inputId}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="sr-only"
+        onChange={onImageChange}
+      />
+      {imagePreviewUrl ?
+        <div className="relative h-[100px] w-[100px] overflow-hidden rounded-lg border border-[#dfe5ed] bg-[#f1f5f9]">
+          <img alt="" className="h-full w-full object-cover" src={imagePreviewUrl} />
+          <button
+            type="button"
+            aria-label={`${uploadLabel} 삭제`}
+            className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-white/90 shadow-sm"
+            onClick={onRemoveImage}
+          >
+            <CreateCloseIcon />
+          </button>
+        </div>
+      : <label
+          htmlFor={inputId}
+          aria-label={uploadLabel}
+          className="relative grid h-[100px] w-[100px] cursor-pointer place-items-center rounded-lg border border-[#dfe5ed] bg-[#f1f5f9] focus-within:ring-2 focus-within:ring-[#32cfc6]"
+        >
+          <img alt="" className="h-5 w-5" src="/votes/create/upload-plus.svg" />
+        </label>}
+      {isUploading ?
+        <p className="text-xs leading-[1.3] text-[#64748b]">업로드 중</p>
+      : null}
+    </div>
+  );
+}
+
 function ImageStep({
   imagePreviewUrl,
   isUploading,
   onImageChange,
   onRemoveImage,
+  optionAImagePreviewUrl,
+  optionBImagePreviewUrl,
+  selectedType,
 }: {
   imagePreviewUrl: string | null;
   isUploading: boolean;
-  onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: () => void;
+  onImageChange: (slot: ImageSlot, event: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemoveImage: (slot: ImageSlot) => void;
+  optionAImagePreviewUrl: string | null;
+  optionBImagePreviewUrl: string | null;
+  selectedType: CreateVoteType;
 }) {
-  const inputId = "create-vote-image";
-
   return (
     <section className="px-5 pt-[18px]">
       <h2 className="text-xl font-bold leading-[1.3] text-[#0f172a]">
         투표 내용을 입력해주세요
       </h2>
-      <div className="mt-8 flex w-[153px] flex-col gap-4">
-        <div className="space-y-1">
-          <p className="text-sm font-semibold leading-[1.3] text-[#334155]">사진 첨부</p>
-          <p className="whitespace-nowrap text-xs leading-[1.3] text-[#64748b]">
-            아직 1개의 사진만 첨부 가능해요
-          </p>
-        </div>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="sr-only"
-          onChange={onImageChange}
-        />
-        {imagePreviewUrl ?
-          <div className="relative h-[100px] w-[100px] overflow-hidden rounded-lg border border-[#dfe5ed] bg-[#f1f5f9]">
-            <img alt="" className="h-full w-full object-cover" src={imagePreviewUrl} />
-            <button
-              type="button"
-              aria-label="첨부 이미지 삭제"
-              className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-white/90 shadow-sm"
-              onClick={onRemoveImage}
-            >
-              <CreateCloseIcon />
-            </button>
-          </div>
-        : <label
-            htmlFor={inputId}
-            aria-label="이미지 업로드"
-            className="relative grid h-[100px] w-[100px] cursor-pointer place-items-center rounded-lg border border-[#dfe5ed] bg-[#f1f5f9] focus-within:ring-2 focus-within:ring-[#32cfc6]"
-          >
-            <img alt="" className="h-5 w-5" src="/votes/create/upload-plus.svg" />
-          </label>}
-        {isUploading ?
-          <p className="text-xs leading-[1.3] text-[#64748b]">업로드 중</p>
-        : null}
+      <div className="mt-8 flex flex-col gap-8">
+        {selectedType === "ab" ?
+          <>
+            <ImageUploadBox
+              accent="#32cfc6"
+              imagePreviewUrl={optionAImagePreviewUrl}
+              inputId="create-vote-option-a-image"
+              isUploading={isUploading}
+              label="선택지 A 사진 첨부"
+              uploadLabel="선택지 A 이미지 업로드"
+              onImageChange={(event) => onImageChange("optionA", event)}
+              onRemoveImage={() => onRemoveImage("optionA")}
+            />
+            <ImageUploadBox
+              accent="#ff6842"
+              imagePreviewUrl={optionBImagePreviewUrl}
+              inputId="create-vote-option-b-image"
+              isUploading={isUploading}
+              label="선택지 B 사진 첨부"
+              uploadLabel="선택지 B 이미지 업로드"
+              onImageChange={(event) => onImageChange("optionB", event)}
+              onRemoveImage={() => onRemoveImage("optionB")}
+            />
+          </>
+        : <ImageUploadBox
+            imagePreviewUrl={imagePreviewUrl}
+            inputId="create-vote-image"
+            isUploading={isUploading}
+            label="사진 첨부"
+            uploadLabel="이미지 업로드"
+            onImageChange={(event) => onImageChange("single", event)}
+            onRemoveImage={() => onRemoveImage("single")}
+          />}
       </div>
     </section>
   );
@@ -348,7 +420,7 @@ function Field({
   label,
 }: {
   children: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
 }) {
   return (
     <label className="flex flex-col gap-1 text-sm font-semibold leading-[1.3] text-[#334155]">
@@ -359,24 +431,39 @@ function Field({
 }
 
 function DetailsStep({
+  accent,
+  labelPrefix,
   price,
   productName,
   setPrice,
   setProductName,
 }: {
+  accent?: string;
+  labelPrefix?: string;
   price: number;
   productName: string;
   setPrice: (price: number) => void;
   setProductName: (productName: string) => void;
 }) {
+  const productLabel = labelPrefix ? `${labelPrefix} 제품명` : "제품명";
+
   return (
     <section className="px-5 pt-[18px]">
       <h2 className="text-xl font-bold leading-[1.3] text-[#0f172a]">
         투표 내용을 입력해주세요
       </h2>
       <div className="mt-8 flex flex-col gap-[22px]">
-        <Field label="제품명">
+        <Field
+          label={
+            labelPrefix && accent ?
+              <>
+                <span style={{ color: accent }}>{labelPrefix}</span> 제품명
+              </>
+            : "제품명"
+          }
+        >
           <input
+            aria-label={productLabel}
             value={productName}
             onChange={(event) => setProductName(event.target.value)}
             placeholder="제품명을 입력해주세요"
@@ -544,72 +631,113 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
   const [step, setStep] = useState<Step>("type");
   const [selectedType, setSelectedType] = useState<CreateVoteType | null>(null);
   const [imagePath, setImagePath] = useState("");
+  const [optionAImagePath, setOptionAImagePath] = useState("");
+  const [optionBImagePath, setOptionBImagePath] = useState("");
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [optionAImagePreviewUrl, setOptionAImagePreviewUrl] = useState<string | null>(null);
+  const [optionBImagePreviewUrl, setOptionBImagePreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState(DEFAULT_PRICE);
+  const [optionAName, setOptionAName] = useState("");
+  const [optionBName, setOptionBName] = useState("");
+  const [optionAPrice, setOptionAPrice] = useState(DEFAULT_PRICE);
+  const [optionBPrice, setOptionBPrice] = useState(DEFAULT_PRICE);
   const [situation, setSituation] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<LifeStageValue[]>([]);
-  const previousObjectUrl = useRef<string | null>(null);
+  const previousObjectUrl = useRef<Record<ImageSlot, string | null>>({
+    optionA: null,
+    optionB: null,
+    single: null,
+  });
 
   useEffect(() => {
+    const objectUrls = previousObjectUrl.current;
     return () => {
-      if (previousObjectUrl.current) {
-        URL.revokeObjectURL(previousObjectUrl.current);
-      }
+      Object.values(objectUrls).forEach((objectUrl) => {
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
+      });
     };
   }, []);
 
-  const hasImage = imagePreviewUrl !== null && imagePath.length > 0;
-  const hasDetails = productName.trim().length > 0 && price > 0;
+  const isBuySkip = selectedType === "buy_skip";
+  const isAb = selectedType === "ab";
+  const hasImage =
+    isAb ?
+      optionAImagePreviewUrl !== null &&
+      optionBImagePreviewUrl !== null &&
+      optionAImagePath.length > 0 &&
+      optionBImagePath.length > 0
+    : imagePreviewUrl !== null && imagePath.length > 0;
+  const hasBuySkipDetails = productName.trim().length > 0 && price > 0;
+  const hasOptionADetails = optionAName.trim().length > 0 && optionAPrice > 0;
+  const hasOptionBDetails = optionBName.trim().length > 0 && optionBPrice > 0;
   const hasSituation =
     situation.trim().length >= MIN_SITUATION_LENGTH && selectedCategories.length > 0;
   const primaryCategory = selectedCategories[0] ?? "";
-  const isBuySkip = selectedType === "buy_skip";
-  const canSubmit = isBuySkip && hasImage && hasDetails && hasSituation;
+  const canSubmit =
+    hasImage &&
+    hasSituation &&
+    (isBuySkip ? hasBuySkipDetails : isAb && hasOptionADetails && hasOptionBDetails);
 
   const hiddenTitle = useMemo(() => situation.trim().slice(0, 80), [situation]);
 
   function goBack() {
     if (step === "image") {
       setStep("type");
-    } else if (step === "details") {
+    } else if (step === "detailsA") {
       setStep("image");
+    } else if (step === "detailsB") {
+      setStep("detailsA");
     } else if (step === "situation") {
-      setStep("details");
+      setStep(isAb ? "detailsB" : "detailsA");
     }
   }
 
-  async function onImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function setImageSlotState(slot: ImageSlot, path: string, previewUrl: string | null) {
+    if (slot === "optionA") {
+      setOptionAImagePath(path);
+      setOptionAImagePreviewUrl(previewUrl);
+    } else if (slot === "optionB") {
+      setOptionBImagePath(path);
+      setOptionBImagePreviewUrl(previewUrl);
+    } else {
+      setImagePath(path);
+      setImagePreviewUrl(previewUrl);
+    }
+  }
+
+  async function onImageChange(slot: ImageSlot, event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    if (previousObjectUrl.current) {
-      URL.revokeObjectURL(previousObjectUrl.current);
+    if (previousObjectUrl.current[slot]) {
+      URL.revokeObjectURL(previousObjectUrl.current[slot]);
     }
 
     const objectUrl = URL.createObjectURL(file);
-    previousObjectUrl.current = objectUrl;
-    setImagePreviewUrl(objectUrl);
+    previousObjectUrl.current[slot] = objectUrl;
+    setImageSlotState(slot, "", objectUrl);
     setUploadError(null);
     setIsUploading(true);
 
     try {
       const result = await uploadDilemmaImage(file);
-      setImagePath(result.path);
+      setImageSlotState(slot, result.path, objectUrl);
     } catch (error) {
       const fallback =
         "이미지를 업로드하지 못했어요. 로그인 상태를 확인하고 다시 시도해주세요.";
       const message = error instanceof Error && error.message ? error.message : fallback;
       console.error("[uploadDilemmaImage] failed", message);
-      setImagePath("");
-      setImagePreviewUrl(null);
-      if (previousObjectUrl.current) {
-        URL.revokeObjectURL(previousObjectUrl.current);
-        previousObjectUrl.current = null;
+      setImageSlotState(slot, "", null);
+      if (previousObjectUrl.current[slot]) {
+        URL.revokeObjectURL(previousObjectUrl.current[slot]);
+        previousObjectUrl.current[slot] = null;
       }
       setUploadError(fallback);
       event.target.value = "";
@@ -618,13 +746,12 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
     }
   }
 
-  function onRemoveImage() {
-    if (previousObjectUrl.current) {
-      URL.revokeObjectURL(previousObjectUrl.current);
-      previousObjectUrl.current = null;
+  function onRemoveImage(slot: ImageSlot) {
+    if (previousObjectUrl.current[slot]) {
+      URL.revokeObjectURL(previousObjectUrl.current[slot]);
+      previousObjectUrl.current[slot] = null;
     }
-    setImagePath("");
-    setImagePreviewUrl(null);
+    setImageSlotState(slot, "", null);
     setUploadError(null);
   }
 
@@ -644,6 +771,12 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
         <input type="hidden" name="category" value={primaryCategory} />
         <input type="hidden" name="situation" value={situation} />
         <input type="hidden" name="imagePath" value={imagePath} />
+        <input type="hidden" name="optionAName" value={optionAName} />
+        <input type="hidden" name="optionBName" value={optionBName} />
+        <input type="hidden" name="optionAPrice" value={optionAPrice} />
+        <input type="hidden" name="optionBPrice" value={optionBPrice} />
+        <input type="hidden" name="optionAImagePath" value={optionAImagePath} />
+        <input type="hidden" name="optionBImagePath" value={optionBImagePath} />
 
         <div className="flex-1">
           {step === "type" ?
@@ -655,14 +788,29 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
               isUploading={isUploading}
               onImageChange={onImageChange}
               onRemoveImage={onRemoveImage}
+              optionAImagePreviewUrl={optionAImagePreviewUrl}
+              optionBImagePreviewUrl={optionBImagePreviewUrl}
+              selectedType={selectedType ?? "buy_skip"}
             />
           : null}
-          {step === "details" ?
+          {step === "detailsA" ?
             <DetailsStep
-              price={price}
-              productName={productName}
-              setPrice={setPrice}
-              setProductName={setProductName}
+              accent={isAb ? "#32cfc6" : undefined}
+              labelPrefix={isAb ? "선택지 A" : undefined}
+              price={isAb ? optionAPrice : price}
+              productName={isAb ? optionAName : productName}
+              setPrice={isAb ? setOptionAPrice : setPrice}
+              setProductName={isAb ? setOptionAName : setProductName}
+            />
+          : null}
+          {step === "detailsB" ?
+            <DetailsStep
+              accent="#ff6842"
+              labelPrefix="선택지 B"
+              price={optionBPrice}
+              productName={optionBName}
+              setPrice={setOptionBPrice}
+              setProductName={setOptionBName}
             />
           : null}
           {step === "situation" ?
@@ -684,19 +832,27 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
 
         {step === "type" ?
           <BottomAction
-            disabled={!selectedType || selectedType !== "buy_skip"}
+            disabled={!selectedType}
             onClick={() => setStep("image")}
           >
             선택 완료
           </BottomAction>
         : null}
         {step === "image" ?
-          <BottomAction disabled={!hasImage || isUploading} onClick={() => setStep("details")}>
+          <BottomAction disabled={!hasImage || isUploading} onClick={() => setStep("detailsA")}>
             다음
           </BottomAction>
         : null}
-        {step === "details" ?
-          <BottomAction disabled={!hasDetails} onClick={() => setStep("situation")}>
+        {step === "detailsA" ?
+          <BottomAction
+            disabled={isAb ? !hasOptionADetails : !hasBuySkipDetails}
+            onClick={() => setStep(isAb ? "detailsB" : "situation")}
+          >
+            다음
+          </BottomAction>
+        : null}
+        {step === "detailsB" ?
+          <BottomAction disabled={!hasOptionBDetails} onClick={() => setStep("situation")}>
             다음
           </BottomAction>
         : null}
