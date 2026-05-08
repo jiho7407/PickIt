@@ -17,7 +17,7 @@ export default function ProfileEditPage() {
 
       <div>
         <div>프로필 이미지</div>
-        <button>설정</button>
+        <button type="button">설정</button>
       </div>
 
       <label>닉네임</label>
@@ -32,6 +32,7 @@ export default function ProfileEditPage() {
       {tags.map((item) => (
         <button
           key={item}
+          type="button"
           onClick={() => setTag(item)}
           style={{
             backgroundColor: tag === item ? "#64748b" : "white",
@@ -42,7 +43,7 @@ export default function ProfileEditPage() {
         </button>
       ))}
 
-      <button>저장하기</button>
+      <button type="button">저장하기</button>
     </main>
   );
-}
+
