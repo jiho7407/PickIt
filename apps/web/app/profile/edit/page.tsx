@@ -1,49 +1,60 @@
-"use client";
+import { redirect } from "next/navigation";
+import { EditProfileForm } from "@/features/profile/edit-profile-form";
+import {
+  isLifeStageValue,
+  LIFE_STAGE_OPTIONS,
+} from "@/features/onboarding/onboarding-trigger";
+import { getLoginHref } from "@/lib/redirect";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-import { useState } from "react";
-import Link from "next/link";
+const lifeStageLabels = new Map(LIFE_STAGE_OPTIONS.map((option) => [option.value, option.label]));
 
-const tags = ["고등학생", "대학생", "취준생", "직장인"];
+export default async function ProfileEditPage() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-export default function ProfileEditPage() {
-  const [nickname, setNickname] = useState("익명의 아나콘다");
-  const [tag, setTag] = useState("대학생");
+  if (!user) {
+    redirect(getLoginHref("/profile/edit"));
+  }
 
-  return (
-    <main>
-      <Link href="/profile">뒤로</Link>
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("nickname, life_stage")
+    .eq("id", user.id)
+    .maybeSingle();
 
-      <h1>프로필 수정</h1>
+  const nickname = profile?.nickname ?? buildFallbackNickname(user.email, user.user_metadata);
+  const lifeStage = getLifeStageLabel(profile?.life_stage);
 
-      <div>
-        <div>프로필 이미지</div>
-        <button type="button">설정</button>
-      </div>
+  return <EditProfileForm initialNickname={nickname} initialLifeStageLabel={lifeStage} />;
+}
 
-      <label>닉네임</label>
-      <input
-        value={nickname}
-        maxLength={10}
-        onChange={(e) => setNickname(e.target.value)}
-      />
-      <p>최대 10글자</p>
+function buildFallbackNickname(
+  email: string | undefined,
+  metadata: Record<string, unknown> | undefined,
+) {
+  const rawNickname =
+    readMetadataString(metadata, "nickname") ??
+    readMetadataString(metadata, "full_name") ??
+    readMetadataString(metadata, "name") ??
+    email?.split("@")[0] ??
+    "PickIt user";
 
-      <p>태그</p>
-      {tags.map((item) => (
-        <button
-          key={item}
-          type="button"
-          onClick={() => setTag(item)}
-          style={{
-            backgroundColor: tag === item ? "#64748b" : "white",
-            color: tag === item ? "white" : "#64748b",
-          }}
-        >
-          {item}
-        </button>
-      ))}
+  const trimmed = rawNickname.trim();
+  return trimmed.length >= 2 ? trimmed.slice(0, 24) : "PickIt user";
+}
 
-      <button type="button">저장하기</button>
-    </main>
-  );
+function readMetadataString(metadata: Record<string, unknown> | undefined, key: string) {
+  const value = metadata?.[key];
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
+function getLifeStageLabel(value: string | null | undefined) {
+  if (!value) {
+    return "대학생";
+  }
+
+  return isLifeStageValue(value) ? (lifeStageLabels.get(value) ?? value) : value;
 }
