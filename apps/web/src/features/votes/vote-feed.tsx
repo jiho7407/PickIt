@@ -70,7 +70,7 @@ function BottomNavigation() {
           <PlusIcon className="h-5 w-5" />
         </Link>
         <Link
-          href="/me"
+          href="/profile"
           className="flex w-[54px] flex-col items-center gap-1 rounded-xl text-xs leading-[1.3] text-[#94a3b8]"
         >
           <ProfileIcon className="h-6 w-6" />

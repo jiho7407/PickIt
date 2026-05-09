@@ -119,6 +119,12 @@ describe("VoteFeed", () => {
     expect(screen.getByRole("button", { name: "B가 나아" })).toBeInTheDocument();
   });
 
+  it("links the profile tab to the profile page", () => {
+    render(<VoteFeed items={sampleItems} quickVoteAction={vi.fn()} />);
+
+    expect(screen.getByRole("link", { name: "프로필" })).toHaveAttribute("href", "/profile");
+  });
+
   it("renders the active stage filter chip and links others to query params", () => {
     render(
       <VoteFeed items={sampleItems} quickVoteAction={vi.fn()} activeStage="university" />,
