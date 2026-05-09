@@ -46,4 +46,4 @@ export default function ProfileEditPage() {
       <button type="button">저장하기</button>
     </main>
   );
-
+}
