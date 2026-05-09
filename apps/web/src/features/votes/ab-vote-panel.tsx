@@ -7,6 +7,7 @@ type AbSelection = {
 };
 
 type AbVotePanelProps = {
+  disabled?: boolean;
   onSelect: (selection: AbSelection) => void;
   optionARatio: number;
   optionBRatio: number;
@@ -17,6 +18,7 @@ type AbVotePanelProps = {
 };
 
 export function AbVotePanel({
+  disabled = false,
   onSelect,
   optionARatio,
   optionBRatio,
@@ -32,6 +34,11 @@ export function AbVotePanel({
     return null;
   }
 
+  const optionATone =
+    voted ? (selected.optionId === optionA.id ? "mint" : "gray") : aWins ? "mint" : "gray";
+  const optionBTone =
+    voted ? (selected.optionId === optionB.id ? "orange" : "gray") : aWins ? "gray" : "orange";
+
   return (
     <div className="flex flex-col gap-2">
       <VoteResultSummary
@@ -45,16 +52,18 @@ export function AbVotePanel({
           label="A가 나아"
           percent={optionARatio}
           selected={selected.optionId === optionA.id}
-          tone={aWins ? "mint" : "gray"}
+          tone={optionATone}
           voted={voted}
+          disabled={disabled}
           onSelect={() => onSelect({ kind: "option", optionId: optionA.id })}
         />
         <VoteResultBar
           label="B가 나아"
           percent={optionBRatio}
           selected={selected.optionId === optionB.id}
-          tone={aWins ? "gray" : "orange"}
+          tone={optionBTone}
           voted={voted}
+          disabled={disabled}
           onSelect={() => onSelect({ kind: "option", optionId: optionB.id })}
         />
       </div>

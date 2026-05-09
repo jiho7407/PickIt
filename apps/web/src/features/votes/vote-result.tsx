@@ -1,6 +1,7 @@
 import { ShoppingBagIcon, SkipChoiceIcon } from "./icons";
 
 type VoteResultBarProps = {
+  disabled?: boolean;
   label: string;
   percent: number;
   tone: "mint" | "orange" | "gray";
@@ -75,6 +76,7 @@ export function VoteResultSummary({
 }
 
 export function VoteResultBar({
+  disabled = false,
   label,
   onSelect,
   percent,
@@ -98,8 +100,9 @@ export function VoteResultBar({
     <button
       type="button"
       aria-pressed={selected}
+      disabled={disabled}
       onClick={onSelect}
-      className={`relative h-11 w-full overflow-hidden rounded-xl border bg-white text-sm font-semibold leading-[1.3] text-[#0f172a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6] ${borderClass}`}
+      className={`relative h-11 w-full overflow-hidden rounded-xl border bg-white text-sm font-semibold leading-[1.3] text-[#0f172a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32cfc6] disabled:cursor-default ${borderClass}`}
     >
       <span
         aria-hidden="true"

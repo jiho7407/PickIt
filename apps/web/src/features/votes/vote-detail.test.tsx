@@ -5,6 +5,7 @@ import { VoteDetail } from "./vote-detail";
 import type { VoteDetailItem } from "./vote-detail.server";
 
 const buySkipDetail: VoteDetailItem = {
+  currentUserId: "user-1",
   id: "dilemma-1",
   title: "브라운 코트 사고 싶은데 면접용으로만 쓰고 안 입을까 봐 고민돼요...",
   productName: "캐시미어브라운 코트",
@@ -14,6 +15,7 @@ const buySkipDetail: VoteDetailItem = {
   createdAt: "2026-04-30T06:20:00.000Z",
   voteType: "buy_skip",
   hasVoted: false,
+  isOwn: false,
   myVote: null,
   author: { nickname: "익명의 아나콘다", lifeStageLabel: "대학생" },
   options: [],
@@ -30,6 +32,7 @@ const buySkipDetail: VoteDetailItem = {
   },
   comments: [
     {
+      authorId: "user-2",
       id: "comment-1",
       authorName: "익명의 아나콘다",
       authorLifeStageLabel: "대학생",
@@ -65,6 +68,8 @@ describe("VoteDetail", () => {
     return render(
       <VoteDetail
         detail={detail}
+        deleteCommentAction={vi.fn(async () => ({ status: "idle" }))}
+        deleteDilemmaAction={vi.fn(async () => ({ status: "idle" }))}
         recordVoteAction={vi.fn(async () => ({ status: "idle" }))}
         submitCommentAction={vi.fn(async () => ({ status: "idle" }))}
       />,
@@ -99,5 +104,25 @@ describe("VoteDetail", () => {
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText(buySkipDetail.comments[0].body)).toBeInTheDocument();
     expect(screen.getByPlaceholderText("댓글을 입력해주세요")).toHaveAttribute("maxLength", "200");
+  });
+
+  it("renders own vote detail as a result view with delete menus", () => {
+    renderDetail({
+      ...buySkipDetail,
+      currentUserId: "user-1",
+      isOwn: true,
+      comments: [
+        {
+          ...buySkipDetail.comments[0],
+          authorId: "user-1",
+        },
+      ],
+    });
+
+    expect(screen.getByText("나의 투표")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "투표 결과" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /삭제 메뉴/ })).toHaveLength(2);
+    expect(screen.getByRole("button", { name: /사도 괜찮아/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /참는 게 나아/ })).toBeDisabled();
   });
 });

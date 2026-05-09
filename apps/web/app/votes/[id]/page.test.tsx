@@ -16,6 +16,14 @@ vi.mock("@/features/votes/vote-actions", () => ({
   submitDetailComment: vi.fn(),
 }));
 
+vi.mock("@/features/comments/comment-actions", () => ({
+  deleteMyComment: vi.fn(),
+}));
+
+vi.mock("@/features/me/my-vote-actions", () => ({
+  archiveMyDilemma: vi.fn(),
+}));
+
 vi.mock("@/features/votes/vote-detail.server", () => ({
   getVoteDetail: vi.fn(),
 }));
@@ -35,6 +43,7 @@ describe("VoteDetailPage", () => {
 
   it("renders the product-02 vote detail page", async () => {
     vi.mocked(getVoteDetail).mockResolvedValue({
+      currentUserId: null,
       id: "dilemma-1",
       title: "브라운 코트 고민",
       productName: "캐시미어브라운 코트",
@@ -44,6 +53,7 @@ describe("VoteDetailPage", () => {
       createdAt: "2026-04-30T06:20:00.000Z",
       voteType: "buy_skip",
       hasVoted: false,
+      isOwn: false,
       myVote: null,
       author: { nickname: "익명의 아나콘다", lifeStageLabel: "대학생" },
       options: [],

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { deleteMyComment } from "@/features/comments/comment-actions";
+import { archiveMyDilemma } from "@/features/me/my-vote-actions";
 import { redirectIfLifeStageMissing } from "@/features/profile/profile-onboarding";
 import { recordDetailVote, submitDetailComment } from "@/features/votes/vote-actions";
 import { VoteDetail } from "@/features/votes/vote-detail";
@@ -31,6 +33,8 @@ export default async function VoteDetailPage({ params }: VoteDetailPageProps) {
   return (
     <VoteDetail
       detail={detail}
+      deleteCommentAction={deleteMyComment}
+      deleteDilemmaAction={archiveMyDilemma}
       recordVoteAction={recordDetailVote}
       submitCommentAction={submitDetailComment}
       isAuthenticated={Boolean(user)}

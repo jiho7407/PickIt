@@ -7,6 +7,7 @@ type BuySkipSelection = {
 
 type BuySkipVotePanelProps = {
   buyRatio: number;
+  disabled?: boolean;
   onSelect: (selection: BuySkipSelection) => void;
   selected: BuySkipSelection;
   skipRatio: number;
@@ -16,6 +17,7 @@ type BuySkipVotePanelProps = {
 
 export function BuySkipVotePanel({
   buyRatio,
+  disabled = false,
   onSelect,
   selected,
   skipRatio,
@@ -23,6 +25,9 @@ export function BuySkipVotePanel({
   voted = false,
 }: BuySkipVotePanelProps) {
   const buyWins = buyRatio >= skipRatio;
+  const buyTone = voted ? (selected.value === "buy" ? "mint" : "gray") : buyWins ? "mint" : "gray";
+  const skipTone =
+    voted ? (selected.value === "skip" ? "orange" : "gray") : buyWins ? "gray" : "orange";
 
   return (
     <div className="flex flex-col gap-2">
@@ -38,16 +43,18 @@ export function BuySkipVotePanel({
           label="사도 괜찮아"
           percent={buyRatio}
           selected={selected.value === "buy"}
-          tone={buyWins ? "mint" : "gray"}
+          tone={buyTone}
           voted={voted}
+          disabled={disabled}
           onSelect={() => onSelect({ kind: "choice", value: "buy" })}
         />
         <VoteResultBar
           label="참는 게 나아"
           percent={skipRatio}
           selected={selected.value === "skip"}
-          tone={buyWins ? "gray" : "orange"}
+          tone={skipTone}
           voted={voted}
+          disabled={disabled}
           onSelect={() => onSelect({ kind: "choice", value: "skip" })}
         />
       </div>

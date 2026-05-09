@@ -26,6 +26,7 @@ type RawOption = {
 };
 
 type RawComment = {
+  author_id: string | null;
   id: string;
   body: string;
   created_at: string;
@@ -33,6 +34,7 @@ type RawComment = {
 };
 
 type RawDilemma = {
+  author_id: string;
   id: string;
   title: string;
   product_name: string;
@@ -55,6 +57,7 @@ export type VoteDetailOption = {
 };
 
 export type VoteDetailComment = {
+  authorId: string | null;
   id: string;
   authorName: string;
   authorLifeStageLabel: string | null;
@@ -68,6 +71,7 @@ export type VoteDetailMyVote = {
 };
 
 export type VoteDetailItem = {
+  currentUserId: string | null;
   id: string;
   title: string;
   productName: string;
@@ -77,6 +81,7 @@ export type VoteDetailItem = {
   createdAt: string;
   voteType: "buy_skip" | "ab";
   hasVoted: boolean;
+  isOwn: boolean;
   myVote: VoteDetailMyVote | null;
   author: {
     nickname: string;
@@ -133,17 +138,14 @@ function ratio(count: number, total: number) {
 async function getCurrentUserVote(
   supabase: VoteDetailClient,
   dilemmaId: string,
+  userId: string | null,
 ): Promise<VoteDetailMyVote | null> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
+  if (userId) {
     const { data, error } = await supabase
       .from("votes")
       .select("choice, option_id")
       .eq("dilemma_id", dilemmaId)
-      .eq("voter_id", user.id)
+      .eq("voter_id", userId)
       .maybeSingle();
 
     if (error || !data) {
@@ -186,10 +188,10 @@ export async function getVoteDetail(
   const { data, error } = await supabase
     .from("dilemmas")
     .select(
-      "id,title,product_name,price,situation,image_path,created_at,vote_type," +
+      "id,author_id,title,product_name,price,situation,image_path,created_at,vote_type," +
         "author:profiles!inner(nickname,life_stage)," +
         "vote_options(id,label,price,image_path,position)," +
-        "comments(id,body,created_at,author:profiles(nickname,life_stage))",
+        "comments(id,author_id,body,created_at,author:profiles(nickname,life_stage))",
     )
     .eq("id", dilemmaId)
     .eq("status", "open")
@@ -204,15 +206,19 @@ export async function getVoteDetail(
   }
 
   const row = data as unknown as RawDilemma;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const [summary, myVote] = await Promise.all([
     getDilemmaVoteSummary(dilemmaId, supabase),
-    getCurrentUserVote(supabase, row.id),
+    getCurrentUserVote(supabase, row.id, user?.id ?? null),
   ]);
   const totalCount = summary?.total_count ?? 0;
   const optionACount = summary?.option_a_count ?? 0;
   const optionBCount = summary?.option_b_count ?? 0;
 
   return {
+    currentUserId: user?.id ?? null,
     id: row.id,
     title: row.title,
     productName: row.product_name,
@@ -222,6 +228,7 @@ export async function getVoteDetail(
     createdAt: row.created_at,
     voteType: row.vote_type === "ab" ? "ab" : "buy_skip",
     hasVoted: myVote !== null,
+    isOwn: Boolean(user && row.author_id === user.id),
     myVote,
     author: {
       nickname: row.author.nickname,
@@ -245,6 +252,7 @@ export async function getVoteDetail(
     comments: [...(row.comments ?? [])]
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
       .map((comment) => ({
+        authorId: comment.author_id,
         id: comment.id,
         authorName: comment.author?.nickname ?? "익명의 아나콘다",
         authorLifeStageLabel: lifeStageLabel(comment.author?.life_stage ?? null),

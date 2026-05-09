@@ -4,7 +4,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import type { DeleteActionState } from "@/features/comments/comment-actions";
 import { VoteCommentForm } from "@/features/comments/vote-comment-form";
+import { DeleteMenu } from "@/features/me/delete-menu";
 import type {
   DetailCommentActionState,
   DetailVoteActionState,
@@ -34,6 +36,14 @@ type VoteDetailProps = {
     state: DetailCommentActionState,
     formData: FormData,
   ) => DetailCommentActionState | Promise<DetailCommentActionState>;
+  deleteCommentAction?: (
+    state: DeleteActionState,
+    formData: FormData,
+  ) => DeleteActionState | Promise<DeleteActionState>;
+  deleteDilemmaAction?: (
+    state: DeleteActionState,
+    formData: FormData,
+  ) => DeleteActionState | Promise<DeleteActionState>;
   isAuthenticated?: boolean;
   loginHref?: string;
 };
@@ -131,7 +141,7 @@ function ProductInfo({ detail }: { detail: VoteDetailItem }) {
     <section className="bg-white p-5">
       <div className="flex items-center justify-between gap-3">
         <AuthorLine
-          nickname={detail.author.nickname}
+          nickname={detail.isOwn ? "나의 투표" : detail.author.nickname}
           lifeStageLabel={detail.author.lifeStageLabel}
         />
         <p className="shrink-0 text-xs leading-[1.3] text-[#94a3b8]">
@@ -149,16 +159,36 @@ function ProductInfo({ detail }: { detail: VoteDetailItem }) {
   );
 }
 
-function CommentItem({ comment }: { comment: VoteDetailComment }) {
+function CommentItem({
+  comment,
+  currentUserId,
+  deleteCommentAction,
+}: {
+  comment: VoteDetailComment;
+  currentUserId: string | null;
+  deleteCommentAction?: VoteDetailProps["deleteCommentAction"];
+}) {
+  const canDelete = Boolean(deleteCommentAction && currentUserId && comment.authorId === currentUserId);
+
   return (
     <li className="border-b border-[#f1f5f9] bg-white px-5 py-4">
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <span className="h-7 w-7 rounded-full bg-[#d9d9d9]" aria-hidden="true" />
-          <AuthorLine
-            nickname={comment.authorName}
-            lifeStageLabel={comment.authorLifeStageLabel}
-          />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="h-7 w-7 rounded-full bg-[#d9d9d9]" aria-hidden="true" />
+            <AuthorLine
+              nickname={comment.authorName}
+              lifeStageLabel={comment.authorLifeStageLabel}
+            />
+          </div>
+          {canDelete && deleteCommentAction ?
+            <DeleteMenu
+              action={deleteCommentAction}
+              fieldName="commentId"
+              fieldValue={comment.id}
+              resourceLabel="댓글"
+            />
+          : null}
         </div>
         <p className="text-sm leading-[1.3] text-[#0f172a]">{comment.body}</p>
         <p className="text-right text-xs leading-[1.3] text-[#94a3b8]">
@@ -169,7 +199,15 @@ function CommentItem({ comment }: { comment: VoteDetailComment }) {
   );
 }
 
-function CommentsSection({ comments }: { comments: VoteDetailComment[] }) {
+function CommentsSection({
+  comments,
+  currentUserId,
+  deleteCommentAction,
+}: {
+  comments: VoteDetailComment[];
+  currentUserId: string | null;
+  deleteCommentAction?: VoteDetailProps["deleteCommentAction"];
+}) {
   return (
     <section className="bg-white">
       <div className="px-5 pb-2 pt-6">
@@ -181,7 +219,12 @@ function CommentsSection({ comments }: { comments: VoteDetailComment[] }) {
       {comments.length > 0 ?
         <ul>
           {comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              currentUserId={currentUserId}
+              deleteCommentAction={deleteCommentAction}
+            />
           ))}
         </ul>
       : null}
@@ -223,6 +266,8 @@ function leadingSelection(detail: VoteDetailItem): VoteSelection | null {
 }
 
 export function VoteDetail({
+  deleteCommentAction,
+  deleteDilemmaAction,
   detail,
   recordVoteAction,
   submitCommentAction,
@@ -248,6 +293,10 @@ export function VoteDetail({
     displayedSelection?.kind === "option" ? displayedSelection : { kind: "option", optionId: "" };
 
   function handleSelect(next: VoteSelection) {
+    if (detail.isOwn) {
+      return;
+    }
+
     if (!isAuthenticated) {
       window.location.assign(loginHref);
       return;
@@ -287,6 +336,16 @@ export function VoteDetail({
         >
           <ChevronLeftIcon className="h-6 w-6" />
         </Link>
+        {detail.isOwn && deleteDilemmaAction ?
+          <div className="ml-auto">
+            <DeleteMenu
+              action={deleteDilemmaAction}
+              fieldName="dilemmaId"
+              fieldValue={detail.id}
+              resourceLabel="투표"
+            />
+          </div>
+        : null}
       </header>
 
       <DetailImages detail={detail} />
@@ -295,8 +354,10 @@ export function VoteDetail({
       <div className="h-2 bg-[#f8faff]" />
       <section className="bg-white">
         <div className="flex items-center justify-between px-5 pb-2 pt-6">
-          <h2 className="text-base font-semibold leading-[1.3] text-[#0f172a]">투표하기</h2>
-          {voted ?
+          <h2 className="text-base font-semibold leading-[1.3] text-[#0f172a]">
+            {detail.isOwn || voted ? "투표 결과" : "투표하기"}
+          </h2>
+          {voted && !detail.isOwn ?
             <span className="rounded-full bg-[#e8fafa] px-2 py-1 text-xs font-semibold text-[#32cfc6]">
               투표 완료 · 다시 눌러 변경 가능
             </span>
@@ -311,6 +372,7 @@ export function VoteDetail({
               totalCount={detail.summary.totalCount}
               selected={abDisplay}
               voted={voted}
+              disabled={detail.isOwn}
               onSelect={handleSelect}
             />
           : <BuySkipVotePanel
@@ -319,6 +381,7 @@ export function VoteDetail({
               totalCount={detail.summary.totalCount}
               selected={buySkipDisplay}
               voted={voted}
+              disabled={detail.isOwn}
               onSelect={handleSelect}
             />}
           {voteFeedback.status === "error" && voteFeedback.message ?
@@ -330,7 +393,11 @@ export function VoteDetail({
       </section>
 
       <div className="h-2 bg-[#f8faff]" />
-      <CommentsSection comments={detail.comments} />
+      <CommentsSection
+        comments={detail.comments}
+        currentUserId={detail.currentUserId}
+        deleteCommentAction={deleteCommentAction}
+      />
       <VoteCommentForm
         action={submitCommentAction}
         dilemmaId={detail.id}
