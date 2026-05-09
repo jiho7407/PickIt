@@ -1,4 +1,4 @@
-import { ShoppingBagIcon, SkipChoiceIcon } from "./icons";
+import { BuyButtonIcon, ShoppingBagIcon, SkipButtonIcon, SkipChoiceIcon } from "./icons";
 
 type VoteResultBarProps = {
   label: string;
@@ -6,6 +6,7 @@ type VoteResultBarProps = {
   tone: "mint" | "orange" | "gray";
   selected: boolean;
   voted?: boolean;
+  icon?: "buy" | "skip";
   onSelect: () => void;
 };
 
@@ -81,6 +82,7 @@ export function VoteResultBar({
   selected,
   tone,
   voted = false,
+  icon,
 }: VoteResultBarProps) {
   const fillClass =
     tone === "mint" ? "bg-[#aaecea]"
@@ -115,6 +117,8 @@ export function VoteResultBar({
       <span
         className={`relative z-10 inline-flex items-center gap-2 ${showVotedMark ? "pl-6" : ""}`}
       >
+        {icon === "buy" ? <BuyButtonIcon className="h-5 w-5 shrink-0" /> : null}
+        {icon === "skip" ? <SkipButtonIcon className="h-5 w-5 shrink-0" /> : null}
         <span>{label}</span>
         <span>{percent}%</span>
       </span>

@@ -40,6 +40,7 @@ export function BuySkipVotePanel({
           selected={selected.value === "buy"}
           tone={buyWins ? "mint" : "gray"}
           voted={voted}
+          icon="buy"
           onSelect={() => onSelect({ kind: "choice", value: "buy" })}
         />
         <VoteResultBar
@@ -48,6 +49,7 @@ export function BuySkipVotePanel({
           selected={selected.value === "skip"}
           tone={buyWins ? "gray" : "orange"}
           voted={voted}
+          icon="skip"
           onSelect={() => onSelect({ kind: "choice", value: "skip" })}
         />
       </div>
