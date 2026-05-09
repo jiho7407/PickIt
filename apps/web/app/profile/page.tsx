@@ -25,11 +25,11 @@ export default function ProfilePage() {
       </section>
 
       <nav>
-        <Link href="/votes/my">내가 올린 투표 &gt;</Link>
+        <Link href="/me/votes">내가 올린 투표 &gt;</Link>
         <br />
-        <Link href="/votes/joined">내가 참여한 투표 &gt;</Link>
+        <Link href="/me/votes">내가 선택한 투표 &gt;</Link>
         <br />
-        <Link href="/votes/commented">댓글 단 투표 &gt;</Link>
+        <Link href="/me/votes">내가 남긴 한마디 &gt;</Link>
         <br />
 
         <button type="button" onClick={() => setIsLogoutOpen(true)}>
@@ -51,4 +51,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
