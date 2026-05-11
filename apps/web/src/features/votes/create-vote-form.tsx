@@ -627,7 +627,7 @@ function SuccessScreen({ dilemmaId }: { dilemmaId: string }) {
 }
 
 export function CreateVoteForm({ action }: CreateVoteFormProps) {
-  const [state, formAction] = useActionState(action, initialActionState);
+  const [state, formAction, isPending] = useActionState(action, initialActionState);
   const [step, setStep] = useState<Step>("type");
   const [selectedType, setSelectedType] = useState<CreateVoteType | null>(null);
   const [imagePath, setImagePath] = useState("");
@@ -857,7 +857,7 @@ export function CreateVoteForm({ action }: CreateVoteFormProps) {
           </BottomAction>
         : null}
         {step === "situation" ?
-          <BottomAction disabled={!canSubmit} type="submit">
+          <BottomAction disabled={!canSubmit || isPending} type="submit">
             투표 업로드하기
           </BottomAction>
         : null}

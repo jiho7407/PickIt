@@ -142,4 +142,40 @@ describe("CreateVoteForm", () => {
       situation: "두 제품 중 어떤 걸 사야 할지 고민돼요.",
     });
   });
+
+  it("does not invoke the action twice when the submit button is clicked rapidly", async () => {
+    const user = userEvent.setup();
+    const action = vi.fn(
+      () => new Promise<{ status: "idle" }>(() => {}),
+    );
+
+    render(<CreateVoteForm action={action} />);
+
+    await user.click(screen.getByRole("button", { name: /살까 말까 투표/ }));
+    await user.click(screen.getByRole("button", { name: "선택 완료" }));
+
+    await user.upload(
+      screen.getByLabelText("이미지 업로드"),
+      new File(["image"], "coat.png", { type: "image/png" }),
+    );
+    await waitFor(() => expect(screen.getByRole("button", { name: "다음" })).toBeEnabled());
+    await user.click(screen.getByRole("button", { name: "다음" }));
+
+    await user.type(screen.getByLabelText("제품명"), "코트");
+    await user.click(screen.getByRole("button", { name: "다음" }));
+
+    await user.type(
+      screen.getByLabelText(/상황/),
+      "겨울 코트 살까 말까 고민됨.",
+    );
+    await user.click(screen.getByRole("button", { name: "대학생" }));
+
+    const submitButton = screen.getByRole("button", { name: "투표 업로드하기" });
+    await user.click(submitButton);
+    await waitFor(() => expect(submitButton).toBeDisabled());
+    await user.click(submitButton);
+    await user.click(submitButton);
+
+    expect(action).toHaveBeenCalledTimes(1);
+  });
 });
