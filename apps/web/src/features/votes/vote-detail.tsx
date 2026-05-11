@@ -297,6 +297,10 @@ export function VoteDetail({
       return;
     }
 
+    if (detail.isClosed) {
+      return;
+    }
+
     if (!isAuthenticated) {
       window.location.assign(loginHref);
       return;
@@ -355,9 +359,13 @@ export function VoteDetail({
       <section className="bg-white">
         <div className="flex items-center justify-between px-5 pb-2 pt-6">
           <h2 className="text-base font-semibold leading-[1.3] text-[#0f172a]">
-            {detail.isOwn || voted ? "투표 결과" : "투표하기"}
+            {detail.isClosed || detail.isOwn || voted ? "투표 결과" : "투표하기"}
           </h2>
-          {voted && !detail.isOwn ?
+          {detail.isClosed ?
+            <span className="rounded-full bg-[#f1f5f9] px-2 py-1 text-xs font-semibold text-[#64748b]">
+              마감됨
+            </span>
+          : voted && !detail.isOwn ?
             <span className="rounded-full bg-[#e8fafa] px-2 py-1 text-xs font-semibold text-[#32cfc6]">
               투표 완료 · 다시 눌러 변경 가능
             </span>
@@ -372,7 +380,7 @@ export function VoteDetail({
               totalCount={detail.summary.totalCount}
               selected={abDisplay}
               voted={voted}
-              disabled={detail.isOwn}
+              disabled={detail.isOwn || detail.isClosed}
               onSelect={handleSelect}
             />
           : <BuySkipVotePanel
@@ -381,9 +389,14 @@ export function VoteDetail({
               totalCount={detail.summary.totalCount}
               selected={buySkipDisplay}
               voted={voted}
-              disabled={detail.isOwn}
+              disabled={detail.isOwn || detail.isClosed}
               onSelect={handleSelect}
             />}
+          {detail.isClosed ?
+            <p className="mt-3 text-xs leading-[1.3] text-[#64748b]">
+              마감된 투표예요. 결과만 확인할 수 있어요.
+            </p>
+          : null}
           {voteFeedback.status === "error" && voteFeedback.message ?
             <p role="alert" className="mt-3 text-xs leading-[1.3] text-[#ff6842]">
               {voteFeedback.message}

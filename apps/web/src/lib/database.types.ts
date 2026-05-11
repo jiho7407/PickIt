@@ -112,6 +112,7 @@ export type Database = {
         Row: {
           author_id: string
           category: string
+          closes_at: string
           created_at: string
           followup_due_at: string
           id: string
@@ -127,6 +128,7 @@ export type Database = {
         Insert: {
           author_id: string
           category: string
+          closes_at?: string
           created_at?: string
           followup_due_at?: string
           id?: string
@@ -142,6 +144,7 @@ export type Database = {
         Update: {
           author_id?: string
           category?: string
+          closes_at?: string
           created_at?: string
           followup_due_at?: string
           id?: string
@@ -409,6 +412,7 @@ export type Database = {
         }[]
       }
       vote_result_notification_threshold: { Args: never; Returns: number }
+      expire_open_dilemmas: { Args: never; Returns: void }
     }
     Enums: {
       [_ in never]: never

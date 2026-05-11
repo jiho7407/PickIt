@@ -31,6 +31,8 @@ type SupabaseStub = {
 function buildSupabaseStub(args: {
   user: { id: string } | null;
   existingVoteId: string | null;
+  dilemmaStatus?: "open" | "closed";
+  dilemmaClosesAt?: string;
   insertResult?: { error: { code: string; message: string } | null };
   updateResult?: { error: { code: string; message: string } | null };
   commentInsertResult?: { error: { code: string; message: string } | null };
@@ -52,13 +54,26 @@ function buildSupabaseStub(args: {
     return builder;
   }
 
+  function selectDilemma() {
+    const builder = {
+      eq: vi.fn(() => builder),
+      maybeSingle: vi.fn(async () => ({
+        data: {
+          status: args.dilemmaStatus ?? "open",
+          closes_at: args.dilemmaClosesAt ?? "2099-01-01T00:00:00.000Z",
+        },
+      })),
+    };
+    return builder;
+  }
+
   return {
     inserts,
     updates,
     client: {
       auth: { getUser: vi.fn(async () => ({ data: { user: args.user } })) },
       from: vi.fn((table: string) => ({
-        select: vi.fn(() => selectVote()),
+        select: vi.fn(() => (table === "dilemmas" ? selectDilemma() : selectVote())),
         insert: vi.fn(async (payload: unknown) => {
           inserts.push({ table, payload });
           if (table === "votes") {
@@ -178,6 +193,44 @@ describe("recordDetailVote", () => {
     );
 
     expect(result.status).toBe("error");
+  });
+
+  it("refuses to record a vote on a closed dilemma", async () => {
+    const stub = buildSupabaseStub({
+      user: { id: "user-1" },
+      existingVoteId: null,
+      dilemmaStatus: "closed",
+    });
+    vi.mocked(createServerSupabaseClient).mockResolvedValue(stub.client as never);
+
+    const result = await recordDetailVote(
+      { status: "idle" },
+      createFormData({ choice: "skip", dilemmaId: "dilemma-1" }),
+    );
+
+    expect(result.status).toBe("error");
+    expect(result.message).toContain("마감");
+    expect(stub.inserts).toHaveLength(0);
+    expect(stub.updates).toHaveLength(0);
+  });
+
+  it("refuses when closes_at has passed even if status is still open", async () => {
+    const stub = buildSupabaseStub({
+      user: { id: "user-1" },
+      existingVoteId: null,
+      dilemmaStatus: "open",
+      dilemmaClosesAt: "2020-01-01T00:00:00.000Z",
+    });
+    vi.mocked(createServerSupabaseClient).mockResolvedValue(stub.client as never);
+
+    const result = await recordDetailVote(
+      { status: "idle" },
+      createFormData({ choice: "skip", dilemmaId: "dilemma-1" }),
+    );
+
+    expect(result.status).toBe("error");
+    expect(result.message).toContain("마감");
+    expect(stub.inserts).toHaveLength(0);
   });
 });
 

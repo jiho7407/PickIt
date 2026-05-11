@@ -51,6 +51,8 @@ describe("VoteDetailPage", () => {
       situation: "브라운 코트 사고 싶은데 고민돼요.",
       imageUrl: null,
       createdAt: "2026-04-30T06:20:00.000Z",
+      closesAt: "2030-01-01T00:00:00.000Z",
+      isClosed: false,
       voteType: "buy_skip",
       hasVoted: false,
       isOwn: false,

@@ -85,4 +85,6 @@ Red-Green-Refactor 순서.
 | `product-05a-profile` | todo | 기본 프로필 화면 |
 | `product-05b-consumption-records` | todo | 소비기록, 회고 prompt, 리포트 CTA |
 | `product-06-notifications-and-errors` | todo | 알람, 에러 화면 |
+| `product-07-vote-auto-close` | todo | 72시간 자동 마감, 마감 상태 UI/투표 차단 |
+| `bug-01-create-vote-duplicate-submission` | todo | 투표 만들기 중복 제출 방지 (isPending) |
 | `test-01-mvp-e2e` | todo | MVP E2E |

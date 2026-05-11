@@ -31,6 +31,27 @@ function readOptionalFormValue(formData: FormData, key: string) {
   return typeof value === "string" && value.length > 0 ? value : null;
 }
 
+async function isDilemmaClosed(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  dilemmaId: string,
+): Promise<boolean> {
+  const { data } = await supabase
+    .from("dilemmas")
+    .select("status, closes_at")
+    .eq("id", dilemmaId)
+    .maybeSingle();
+
+  if (!data) {
+    return false;
+  }
+
+  if (data.status === "closed") {
+    return true;
+  }
+
+  return new Date(data.closes_at).getTime() <= Date.now();
+}
+
 export async function castQuickVote(formData: FormData) {
   const dilemmaId = readRequiredFormValue(formData, "dilemmaId");
   const optionId = formData.get("optionId");
@@ -43,6 +64,12 @@ export async function castQuickVote(formData: FormData) {
 
   if (!user) {
     redirect(getLoginHref(redirectTo));
+  }
+
+  // Auto-close gate: refuse silently from the home card (no error UI here).
+  if (await isDilemmaClosed(supabase, dilemmaId)) {
+    revalidatePath("/");
+    return;
   }
 
   const votePayload =
@@ -143,6 +170,13 @@ export async function recordDetailVote(
     return {
       status: "error",
       message: "로그인한 뒤 투표할 수 있어요.",
+    };
+  }
+
+  if (await isDilemmaClosed(supabase, dilemmaId)) {
+    return {
+      status: "error",
+      message: "이미 마감된 투표예요.",
     };
   }
 

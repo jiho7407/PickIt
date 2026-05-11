@@ -92,6 +92,9 @@ export async function getPublicVoteFeedItems(
   client?: VoteFeedClient,
 ): Promise<VoteFeedItem[]> {
   const supabase = client ?? (await createServerSupabaseClient());
+  // Lazy-expire overdue open dilemmas before reading. Idempotent and cheap.
+  await supabase.rpc("expire_open_dilemmas");
+
   let query = supabase
     .from("dilemmas")
     .select(

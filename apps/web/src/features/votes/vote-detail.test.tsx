@@ -13,6 +13,8 @@ const buySkipDetail: VoteDetailItem = {
   situation: "브라운 코트 사고 싶은데 면접용으로만 쓰고 안 입을까 봐 고민돼요...",
   imageUrl: null,
   createdAt: "2026-04-30T06:20:00.000Z",
+  closesAt: "2030-01-01T00:00:00.000Z",
+  isClosed: false,
   voteType: "buy_skip",
   hasVoted: false,
   isOwn: false,
@@ -124,5 +126,20 @@ describe("VoteDetail", () => {
     expect(screen.getAllByRole("button", { name: /삭제 메뉴/ })).toHaveLength(2);
     expect(screen.getByRole("button", { name: /사도 괜찮아/ })).toBeDisabled();
     expect(screen.getByRole("button", { name: /참는 게 나아/ })).toBeDisabled();
+  });
+
+  it("shows a closed badge and disables voting on closed dilemmas while keeping the comment input", () => {
+    renderDetail({
+      ...buySkipDetail,
+      isClosed: true,
+      closesAt: "2020-01-01T00:00:00.000Z",
+    });
+
+    expect(screen.getByText("마감됨")).toBeInTheDocument();
+    expect(screen.getByText(/마감된 투표예요/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "투표 결과" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /사도 괜찮아/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /참는 게 나아/ })).toBeDisabled();
+    expect(screen.getByPlaceholderText("댓글을 입력해주세요")).toBeInTheDocument();
   });
 });

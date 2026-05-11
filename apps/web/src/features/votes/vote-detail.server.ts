@@ -42,6 +42,8 @@ type RawDilemma = {
   situation: string;
   image_path: string | null;
   created_at: string;
+  closes_at: string;
+  status: string;
   vote_type: string;
   author: RawAuthor;
   vote_options: RawOption[] | null;
@@ -79,6 +81,8 @@ export type VoteDetailItem = {
   situation: string;
   imageUrl: string | null;
   createdAt: string;
+  closesAt: string;
+  isClosed: boolean;
   voteType: "buy_skip" | "ab";
   hasVoted: boolean;
   isOwn: boolean;
@@ -185,16 +189,19 @@ export async function getVoteDetail(
   client?: VoteDetailClient,
 ): Promise<VoteDetailItem | null> {
   const supabase = client ?? (await createServerSupabaseClient());
+  // Lazy-expire overdue open dilemmas so the page reflects accurate status.
+  await supabase.rpc("expire_open_dilemmas");
+
   const { data, error } = await supabase
     .from("dilemmas")
     .select(
-      "id,author_id,title,product_name,price,situation,image_path,created_at,vote_type," +
+      "id,author_id,title,product_name,price,situation,image_path,created_at,closes_at,status,vote_type," +
         "author:profiles!inner(nickname,life_stage)," +
         "vote_options(id,label,price,image_path,position)," +
         "comments(id,author_id,body,created_at,author:profiles(nickname,life_stage))",
     )
     .eq("id", dilemmaId)
-    .eq("status", "open")
+    .in("status", ["open", "closed"])
     .maybeSingle();
 
   if (error) {
@@ -216,6 +223,7 @@ export async function getVoteDetail(
   const totalCount = summary?.total_count ?? 0;
   const optionACount = summary?.option_a_count ?? 0;
   const optionBCount = summary?.option_b_count ?? 0;
+  const isClosed = row.status === "closed" || new Date(row.closes_at).getTime() <= Date.now();
 
   return {
     currentUserId: user?.id ?? null,
@@ -226,6 +234,8 @@ export async function getVoteDetail(
     situation: row.situation,
     imageUrl: toPublicImageUrl(row.image_path, supabase),
     createdAt: row.created_at,
+    closesAt: row.closes_at,
+    isClosed,
     voteType: row.vote_type === "ab" ? "ab" : "buy_skip",
     hasVoted: myVote !== null,
     isOwn: Boolean(user && row.author_id === user.id),
